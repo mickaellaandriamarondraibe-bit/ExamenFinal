@@ -1,88 +1,37 @@
 # Taches.md
 
-## Livraison 1 - 20/07/2026 : 08h00-13h00
+## Livraison 1 - 20/07/2026 : 08h00-13h00 (Tag v1)
 
-### 🕗 08h00 - 08h30 : Mickaellah & Idealy (ensemble)
-- Mise en place du projet CodeIgniter 4 (structure, config `.env`, connexion SQLite)
-- Conception commune du schéma de base de données (tables + relations)
-- Répartition confirmée : **Mickaellah = côté Opérateur**, **Idealy = côté Client**
+### Mickaellah & Idealy (ensemble - 08h00 à 08h30)
+- Ont mis en place le projet CodeIgniter 4 (structure, config .env, connexion SQLite)
+- Ont conçu ensemble le schéma de la base de données (tables + relations)
+- Ont réparti le travail : Mickaellah = côté Opérateur, Idealy = côté Client
 
----
+### Mickaellah (côté Opérateur)
+- A créé base.sql avec les tables prefix, type_operation, bareme_frais et données de test
+- A ajouté dans base.sql les tables clients, comptes, transactions et données de test
+- A développé PrefixModel et le Controller "Configuration des préfixes" (CRUD des préfixes valables)
+- A développé TypeOperationModel (gestion des types dépôt/retrait/transfert)
+- A développé BaremeFraisModel (CRUD des tranches de montant/frais, modifiable)
+- A créé la vue "Configuration barème" (formulaire admin)
+- A développé le Controller "Situation des gains" (calcul des gains via frais retrait/transfert)
+- A développé le Controller "Situation des comptes clients" (liste + soldes, vue admin)
+- A créé la vue "Dashboard Opérateur" (récapitulatif gains + comptes clients)
 
-### 🕣 08h30 - 09h15
+### Idealy (côté Client)
 
-**Mickaellah**
-- Création `base.sql` : tables `prefix`, `type_operation`, `bareme_frais` + données de test
+- A développé ClientModel (recherche/création automatique de compte par numéro de téléphone)
+- A développé ClientController (login automatique par numéro, sans inscription préalable)
+- A développé TransactionModel (structure dépôt/retrait/transfert)
+- A créé la vue "Solde" (affichage du solde du client connecté)
+- A développé le Controller "Dépôt automatique" (crédit du compte)
+- A développé le Controller "Retrait automatique" (débit + application du barème de frais)
+- A développé le Controller "Transfert" (débit/crédit entre deux clients)
+- A créé la vue "Historique des transactions" (liste + filtre par type)
 
-**Michaellah**
-- Ajout dans `base.sql` : tables `clients`, `comptes`, `transactions` + données de test
-
----
-
-### 🕤 09h15 - 09h30 : Mickaellah & Idealy (ensemble)
-- Fusion et test de `base.sql` complet (import SQLite, vérification)
-- Mise en place du template Bootstrap commun (`layout.php`, navbar)
-
----
-
-### 🕤 09h30 - 10h30
-
-**Mickaellah**
-- `PrefixModel` + Controller "Configuration des préfixes" (CRUD préfixes)
-- `TypeOperationModel` (gestion dépôt/retrait/transfert)
-
-**Idealy**
-- `ClientModel` : recherche/création automatique de compte par numéro
-- `ClientController` : login automatique par numéro de téléphone (sans inscription)
-
----
-
-### 🕥 10h30 - 11h30
-
-**Mickaellah**
-- `BaremeFraisModel` (CRUD tranches de montant/frais)
-- Vue "Configuration barème" (formulaire admin, modifiable)
-
-**Idealy**
-- `TransactionModel` (structure dépôt/retrait/transfert)
-- Vue "Solde" : affichage du solde du client connecté
+### Mickaellah & Idealy (ensemble - 12h45 à 13h00)
+- Ont testé le fonctionnement croisé (retrait applique bien le barème créé par Mickaellah)
+- Ont vérifié le fichier base.sql final
+- Ont poussé le code et publié le tag v1
 
 ---
-
-### 🕦 11h30 - 12h15
-
-**Mickaellah**
-- Controller "Situation des gains" (calcul gains via frais retrait/transfert)
-- Controller "Situation des comptes clients" (liste + soldes, vue admin)
-
-**Idealy**
-- Controller "Dépôt automatique" (crédit du compte)
-- Controller "Retrait automatique" (débit + application du barème de frais)
-
----
-
-### 🕛 12h15 - 12h45
-
-**Mickaellah**
-- Vue "Dashboard Opérateur" (récapitulatif gains + comptes clients)
-
-**Idealy**
-- Vue "Historique des transactions" (liste + filtre par type)
-- Controller "Transfert" (débit/crédit entre deux clients)
-
----
-
-### 🕧 12h45 - 13h00 : Mickaellah & Idealy (ensemble)
-- Tests croisés (le retrait applique bien le barème créé par Mickaellah)
-- Vérification finale de `base.sql`
-- Push final + création et publication du tag **v1**
-
----
-
-## Résumé de la charge (équilibrée)
-
-| Étudiant | Blocs de travail solo | Durée solo totale |
-|---|---|---|
-| Mickaellah | 5 blocs | ~3h30 |
-| Idealy | 5 blocs | ~3h30 |
-| Ensemble | 3 moments | ~1h00 |
