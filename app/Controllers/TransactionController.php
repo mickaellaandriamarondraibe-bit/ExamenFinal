@@ -315,4 +315,16 @@ class TransactionController extends BaseController
             'recevra'  => $montant,            // ce que le destinataire/le client reçoit
         ]);
     }
+public function getHistorique($compte_id)
+{
+    $transactionModel = new TransactionModel();
+
+    $data = [
+        'title' => 'Historique du compte',
+        'historique' => $transactionModel->getHistorique($compte_id),
+        'compte_id' => $compte_id
+    ];
+
+    return view('transaction/index', $data);
+}
 }

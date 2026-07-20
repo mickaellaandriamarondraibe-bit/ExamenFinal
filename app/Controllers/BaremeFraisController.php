@@ -42,7 +42,7 @@ class BaremeFraisController extends BaseController
             'frais' => $this->request->getPost('frais')
         ]);
 
-        return redirect()->to('/baremes-frais');
+        return redirect()->to('/operateur/baremes-frais');
     }
 
     public function edit($id)
@@ -70,7 +70,7 @@ class BaremeFraisController extends BaseController
             'frais' => $this->request->getPost('frais')
         ]);
 
-        return redirect()->to('/baremes-frais');
+        return redirect()->to('/operateur/baremes-frais');
     }
 
     public function delete($id)
@@ -79,6 +79,6 @@ class BaremeFraisController extends BaseController
 
         $model->delete($id);
 
-        return redirect()->to('/baremes-frais');
+        return redirect()->to('/operateur/baremes-frais');
     }
 }

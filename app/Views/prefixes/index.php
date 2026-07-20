@@ -10,7 +10,7 @@
         </div>
     </div>
 
-    <a href="<?= base_url('prefixes/create') ?>" class="btn btn-primary">
+    <a href="<?= base_url('operateur/prefixes/create') ?>" class="btn btn-primary">
         <i class="bi bi-plus-lg"></i>
         Nouveau préfixe
     </a>
@@ -29,40 +29,45 @@
             </thead>
 
             <tbody>
-                <?php foreach ($prefixes as $prefixe): ?>
+                <?php if (!empty($prefixes)): ?>
+
+                    <?php foreach ($prefixes as $prefixe): ?>
+                        <tr>
+                            <td><?= esc($prefixe['id']) ?></td>
+
+                            <td><?= esc($prefixe['prefixe']) ?></td>
+
+                            <td>
+                                <?php if ($prefixe['actif'] == 1): ?>
+                                    <span class="status-active">Actif</span>
+                                <?php else: ?>
+                                    <span class="status-inactive">Inactif</span>
+                                <?php endif; ?>
+                            </td>
+
+                            <td>
+                                <a href="<?= base_url('operateur/prefixes/edit/' . $prefixe['id']) ?>" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                    Modifier
+                                </a>
+
+                                <a href="<?= base_url('operateur/prefixes/delete/' . $prefixe['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce préfixe ?')">
+                                    <i class="bi bi-trash"></i>
+                                    Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+
+                <?php else: ?>
+
                     <tr>
-                        <td><?= $prefixe['id'] ?></td>
-
-                        <td><?= esc($prefixe['prefixe']) ?></td>
-
-                        <td>
-                            <?php if ($prefixe['actif'] == 1): ?>
-                                <span class="status-active">Actif</span>
-                            <?php else: ?>
-                                <span class="status-inactive">Inactif</span>
-                            <?php endif; ?>
-                        </td>
-
-                        <td>
-                            <a
-                                href="<?= base_url('prefixes/edit/' . $prefixe['id']) ?>"
-                                class="btn btn-warning btn-sm"
-                            >
-                                <i class="bi bi-pencil"></i>
-                                Modifier
-                            </a>
-
-                            <a
-                                href="<?= base_url('prefixes/delete/' . $prefixe['id']) ?>"
-                                class="btn btn-danger btn-sm"
-                                onclick="return confirm('Supprimer ce préfixe ?')"
-                            >
-                                <i class="bi bi-trash"></i>
-                                Supprimer
-                            </a>
+                        <td colspan="4" class="text-center">
+                            Aucun préfixe trouvé.
                         </td>
                     </tr>
-                <?php endforeach; ?>
+
+                <?php endif; ?>
             </tbody>
         </table>
     </div>

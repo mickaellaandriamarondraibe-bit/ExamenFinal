@@ -6,7 +6,9 @@
 
 <h3>Ajouter un préfixe</h3>
 
-<form action="<?= base_url('prefixes/store') ?>" method="post">
+<form action="<?= base_url('operateur/prefixes/store') ?>" method="post">
+
+<?= csrf_field() ?>
 
 <div class="mb-3">
 
@@ -37,7 +39,7 @@ required>
 Enregistrer
 </button>
 
-<a href="<?= base_url('prefixes') ?>" class="btn btn-secondary">
+<a href="<?= base_url('operateur/prefixes') ?>" class="btn btn-secondary">
 Annuler
 </a>
 

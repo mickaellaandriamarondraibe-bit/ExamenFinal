@@ -1,3 +1,10 @@
+CREATE TABLE operateurs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    mot_de_passe VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE prefixes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     prefixe TEXT NOT NULL UNIQUE,
@@ -61,6 +68,8 @@ CREATE TABLE transactions (
         REFERENCES comptes(id)
 );
 
+
+
 INSERT INTO prefixes (prefixe) VALUES
 ('033'),
 ('037');
@@ -69,3 +78,14 @@ INSERT INTO types_operations (libelle) VALUES
 ('DEPOT'),
 ('RETRAIT'),
 ('TRANSFERT');
+
+INSERT INTO operateurs (
+    nom,
+    email,
+    mot_de_passe
+)
+VALUES (
+    'Administrateur',
+    'admin@gmail.com',
+    '$2y$10$/y57SG79ljn7/Z/u2maVhelpRLOVLvtrxKbLfRxA//mgSVgRNmOn2'
+);
