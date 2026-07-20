@@ -117,19 +117,16 @@
 
           <input
             type="checkbox"
-            name="prise_en_charge_commission"
-            id="prise_en_charge_commission"
+            name="inclure_frais_retrait"
+id="inclure_frais_retrait"
             value="1"
             <?= old('prise_en_charge_commission') ? 'checked' : '' ?>
           >
 
-          Prendre en charge la commission
+          Inclure les frais de retrait
 
         </label>
 
-        <small>
-          Si cette option n’est pas cochée, la commission sera retirée du montant reçu.
-        </small>
 
       </div>
 
@@ -213,10 +210,8 @@ const montantInput = document.getElementById('montant');
 
 const telephoneInput = document.getElementById('telephone');
 
-const priseEnChargeInput = document.getElementById(
-  'prise_en_charge_commission'
-);
-
+const priseEnChargeInput =
+    document.getElementById('prise_en_charge_commission');
 const fraisElement = document.getElementById('frais');
 
 const commissionElement = document.getElementById('commission');
@@ -275,10 +270,10 @@ function calculerTransfert()
 
     donnees.append('telephone', telephone);
     donnees.append('type_operation_id', 3);
-    donnees.append(
-      'prise_en_charge_commission',
-      priseEnChargeCommission
-    );
+   donnees.append(
+    'inclure_frais_retrait',
+    inclureFraisRetraitInput.checked ? 1 : 0
+);
 
     donnees.append(
       '<?= csrf_token() ?>',
@@ -353,9 +348,9 @@ telephoneInput.addEventListener(
 );
 
 
-priseEnChargeInput.addEventListener(
-  'change',
-  calculerTransfert
+inclureFraisRetraitInput.addEventListener(
+    'change',
+    planifierCalcul
 );
 
 </script>
