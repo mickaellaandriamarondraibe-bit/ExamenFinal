@@ -1293,3 +1293,30 @@ in APPPATH/Controllers/TransactionController.php on line 177.
  6 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
  7 SYSTEMPATH/rewrite.php(44): require_once('/home/mickaella/Projet/2026/s4/nouveau/INF205_Systeme_Information/ExamenFinal/public/index.php')
 >>>>>>> 6d538d711eab96b55f65b4f95af19353a9f73131
+CRITICAL - 2026-07-20 13:57:26 --> Error: Class "App\Controllers\PrefixModel" not found
+[Method: POST, Route: transfert]
+in APPPATH/Controllers/TransactionController.php on line 177.
+ 1 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\TransactionController->enregistrerTransfert()
+ 2 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 3 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 4 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+ 6 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 14:01:34 --> Error: Class "App\Controllers\PrefixModel" not found
+[Method: POST, Route: transfert]
+in APPPATH/Controllers/TransactionController.php on line 177.
+ 1 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\TransactionController->enregistrerTransfert()
+ 2 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 3 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 4 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+ 6 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 14:04:53 --> Error: Class "App\Controllers\CommissionInterOperateurModel" not found
+[Method: POST, Route: transfert]
+in APPPATH/Controllers/TransactionController.php on line 180.
+ 1 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\TransactionController->enregistrerTransfert()
+ 2 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 3 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 4 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+ 6 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()

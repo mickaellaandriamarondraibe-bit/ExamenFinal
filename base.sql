@@ -198,6 +198,57 @@ VALUES
 ('Orange'),
 ('Airtel');
 
+-- =========================================================
+-- CLIENTS DES AUTRES OPÉRATEURS
+-- =========================================================
+
+-- Clients Orange (préfixe 032 => prefix_id = 3)
+INSERT INTO clients (
+    prefix_id,
+    telephone
+)
+VALUES
+(3, '0321234567'),
+(3, '0329876543');
+
+
+-- Clients Airtel (préfixe 031 => prefix_id = 4)
+INSERT INTO clients (
+    prefix_id,
+    telephone
+)
+VALUES
+(4, '0311234567'),
+(4, '0319876543');
+
+
+
+-- =========================================================
+-- COMPTES DES CLIENTS DES AUTRES OPÉRATEURS
+-- =========================================================
+
+-- Comptes Orange
+INSERT INTO comptes (
+    client_id,
+    numero_compte,
+    solde,
+    statut
+)
+VALUES
+(1, 'ORANGE001', 500000, 'ACTIF'),
+(2, 'ORANGE002', 300000, 'ACTIF');
+
+
+-- Comptes Airtel
+INSERT INTO comptes (
+    client_id,
+    numero_compte,
+    solde,
+    statut
+)
+VALUES
+(3, 'AIRTEL001', 700000, 'ACTIF'),
+(4, 'AIRTEL002', 200000, 'ACTIF');
 
 -- =========================================================
 -- INSERTION DES PRÉFIXES

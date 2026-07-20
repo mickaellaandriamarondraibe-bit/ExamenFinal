@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\TransactionModel;
 use App\Models\CompteModel;
 use App\Models\BaremeFraisModel;
+use App\Models\PrefixModel;
+use App\Models\CommissionInterOperateurModel ;
 
 class TransactionController extends BaseController
 {
