@@ -542,16 +542,14 @@
             <div class="commission-option">
 
                 <label class="checkbox-line">
-                    <input
-                        type="checkbox"
-                        name="prise_en_charge_commission"
-                        id="prise_en_charge_commission"
-                        value="1"
-                    >
+                   <input
+    type="checkbox"
+    name="inclure_frais_retrait"
+    id="inclure_frais_retrait"
+    value="1"
+>
 
-                    <span>
-                        Prendre en charge les commissions
-                    </span>
+<span>Inclure les frais de retrait</span>
                 </label>
 
                 <p class="commission-description">
@@ -586,6 +584,12 @@
                     </strong>
                 </div>
 
+                    <div class="summary-row">
+    <span>Frais de retrait</span>
+    <strong>
+        <span id="resume-frais-retrait">0</span> Ar
+    </strong>
+</div>
                 <div class="summary-row">
                     <span>Commissions totales</span>
 
@@ -700,9 +704,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const montantInput =
         document.getElementById('montant_total');
 
-    const priseEnChargeInput =
-        document.getElementById('prise_en_charge_commission');
-
+  const inclureRetraitInput =
+    document.getElementById('inclure_frais_retrait');
     const formulaire =
         document.getElementById('form-transfert-multiple');
 
@@ -791,6 +794,9 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById(
             'resume-total'
         ).textContent = '0';
+        document.getElementById(
+    'resume-frais-retrait'
+).textContent = '0';
 
         const carteRepartition =
             document.getElementById('distribution-card');
@@ -896,9 +902,9 @@ document.addEventListener('DOMContentLoaded', function () {
         );
 
         donnees.append(
-            'prise_en_charge_commission',
-            priseEnChargeInput.checked ? 1 : 0
-        );
+    'inclure_frais_retrait',
+    inclureRetraitInput.checked ? 1 : 0
+);
 
         telephones.forEach(function (telephone) {
             donnees.append(
@@ -1043,10 +1049,10 @@ document.addEventListener('DOMContentLoaded', function () {
         planifierCalcul
     );
 
-    priseEnChargeInput.addEventListener(
-        'change',
-        planifierCalcul
-    );
+   inclureRetraitInput.addEventListener(
+    'change',
+    planifierCalcul
+);
 
     formulaire.addEventListener(
         'submit',
