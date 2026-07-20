@@ -27,17 +27,40 @@
             background: #f7f6f2;
             color: #1f2937;
             font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 12px;
         }
 
         .mobile-container {
             width: 100%;
-            max-width: 430px;
-            min-height: 100vh;
+            max-width: 440px;
+            height: calc(100vh - 48px);
+            max-height: 900px;
+            min-height: 740px;
             margin: 0 auto;
-            padding-bottom: 90px;
             background: #ffffff;
-            border-left: 1px solid #eeeeee;
-            border-right: 1px solid #eeeeee;
+            border: 10px solid #111814;
+            border-radius: 34px;
+            box-shadow: 0 10px 30px rgba(18, 61, 46, 0.10);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mobile-container::before {
+            content: "";
+            position: absolute;
+            top: 7px;
+            left: 50%;
+            width: 78px;
+            height: 5px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: #26302b;
+            z-index: 5;
         }
 
         .page-header {
@@ -71,6 +94,9 @@
 
         .page-content {
             padding: 20px;
+            padding-bottom: 90px;
+            flex: 1;
+            overflow-y: auto;
         }
 
         .alert {
@@ -353,45 +379,21 @@
             text-decoration: none;
         }
 
-        .bottom-navigation {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            z-index: 50;
-            width: 100%;
-            max-width: 430px;
-            height: 70px;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            transform: translateX(-50%);
-            border-top: 1px solid #e5e7eb;
-            background: #ffffff;
-        }
+        @media (max-width: 430px) {
+            body {
+                padding: 0;
+            }
 
-        .navigation-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            color: #6b827a;
-            font-size: 10px;
-            text-decoration: none;
-        }
-
-        .navigation-icon {
-            font-size: 17px;
-            line-height: 1;
-        }
-
-        .navigation-item.active {
-            color: #00543f;
-            font-weight: 700;
-        }
-
-        @media (min-width: 431px) {
             .mobile-container {
-                box-shadow: 0 0 18px rgba(15, 23, 42, 0.05);
+                max-width: none;
+                height: 100vh;
+                min-height: 100vh;
+                border: 0;
+                border-radius: 0;
+            }
+
+            .mobile-container::before {
+                display: none;
             }
         }
     </style>
@@ -540,21 +542,18 @@
             </div>
 
             <div class="commission-option">
-
                 <label class="checkbox-line">
-                   <input
-    type="checkbox"
-    name="inclure_frais_retrait"
-    id="inclure_frais_retrait"
-    value="1"
->
-
-<span>Inclure les frais de retrait</span>
+                    <input
+                        type="checkbox"
+                        name="inclure_frais_retrait"
+                        id="inclure_frais_retrait"
+                        value="1"
+                        <?= old('inclure_frais_retrait') ? 'checked' : '' ?>
+                    >
+                    <span>Inclure les frais de retrait</span>
                 </label>
-
                 <p class="commission-description">
-                    Si cette option n’est pas cochée, chaque commission sera
-                    retirée du montant reçu par le destinataire concerné.
+                    Disponible seulement pour les numéros 033 et 037.
                 </p>
             </div>
 
@@ -584,12 +583,13 @@
                     </strong>
                 </div>
 
-                    <div class="summary-row">
-    <span>Frais de retrait</span>
-    <strong>
-        <span id="resume-frais-retrait">0</span> Ar
-    </strong>
-</div>
+                <div class="summary-row">
+                    <span>Frais de retrait</span>
+
+                    <strong>
+                        <span id="resume-frais-retrait">0</span> Ar
+                    </strong>
+                </div>
                 <div class="summary-row">
                     <span>Commissions totales</span>
 
@@ -647,51 +647,8 @@
 
     </main>
 
+    <?= view('templates/bottom_nav', ['active' => 'transfert']) ?>
 </div>
-
-<nav class="bottom-navigation">
-
-    <a
-        href="<?= site_url('accueil') ?>"
-        class="navigation-item"
-    >
-        <span class="navigation-icon">⌂</span>
-        <span>Accueil</span>
-    </a>
-
-    <a
-        href="<?= site_url('depot') ?>"
-        class="navigation-item"
-    >
-        <span class="navigation-icon">↓</span>
-        <span>Dépôt</span>
-    </a>
-
-    <a
-        href="<?= site_url('retrait') ?>"
-        class="navigation-item"
-    >
-        <span class="navigation-icon">↑</span>
-        <span>Retrait</span>
-    </a>
-
-    <a
-        href="<?= site_url('transfert') ?>"
-        class="navigation-item active"
-    >
-        <span class="navigation-icon">⇄</span>
-        <span>Transfert</span>
-    </a>
-
-    <a
-        href="#"
-        class="navigation-item"
-    >
-        <span class="navigation-icon">•••</span>
-        <span>Plus</span>
-    </a>
-
-</nav>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -726,6 +683,27 @@ document.addEventListener('DOMContentLoaded', function () {
         ).map(function (input) {
             return input.value.replace(/\D/g, '');
         });
+    }
+
+    function estNumeroInterne(telephone) {
+        return (
+            telephone.startsWith('033') ||
+            telephone.startsWith('037')
+        );
+    }
+
+    function synchroniserOptionRetrait() {
+        const contientNumeroExterne =
+            obtenirTelephones().some(function (telephone) {
+                return telephone.length >= 3 &&
+                    !estNumeroInterne(telephone);
+            });
+
+        inclureRetraitInput.disabled = contientNumeroExterne;
+
+        if (contientNumeroExterne) {
+            inclureRetraitInput.checked = false;
+        }
     }
 
     function mettreAJourNumerotation() {
@@ -858,11 +836,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function calculerTransfertMultiple() {
+        synchroniserOptionRetrait();
+
         const montantTotal =
             parseInt(montantInput.value, 10) || 0;
 
         const telephones =
             obtenirTelephones();
+
+        const erreurDestinataires =
+            document.getElementById('erreur-destinataires');
+
+        erreurDestinataires.textContent = '';
 
         const nombre =
             telephones.length;
@@ -941,6 +926,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 resultat.success === false
             ) {
                 reinitialiserResultats();
+                erreurDestinataires.textContent =
+                    resultat.error || 'Calcul impossible';
                 return;
             }
 
@@ -948,7 +935,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 'resume-frais'
             ).textContent =
                 formaterMontant(resultat.total_frais);
-
+            document.getElementById(
+    'resume-frais-retrait'
+).textContent =
+    formaterMontant(resultat.total_frais_retrait);
             document.getElementById(
                 'resume-commission'
             ).textContent =
@@ -979,6 +969,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function planifierCalcul() {
+        synchroniserOptionRetrait();
+
         clearTimeout(minuteurCalcul);
 
         minuteurCalcul = setTimeout(
@@ -1053,6 +1045,8 @@ document.addEventListener('DOMContentLoaded', function () {
     'change',
     planifierCalcul
 );
+
+    synchroniserOptionRetrait();
 
     formulaire.addEventListener(
         'submit',

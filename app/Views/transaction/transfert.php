@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobi Money — Transfert</title>
+<title>Mobile Money — Transfert</title>
 <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
 </head>
 
@@ -54,7 +54,7 @@
         </div>
       </div>
 
-      <div class="field">
+      <div class="field checkbox-field">
         <label for="inclure_frais_retrait">
           <input
             type="checkbox"
@@ -125,6 +125,21 @@ const total = document.getElementById('total');
 
 let timer;
 
+function estNumeroInterne(numero) {
+  return numero.startsWith('033') || numero.startsWith('037');
+}
+
+function synchroniserOptionRetrait() {
+  const numero = telephone.value.replace(/\D/g, '');
+  const interne = estNumeroInterne(numero);
+
+  retrait.disabled = numero.length >= 3 && !interne;
+
+  if (retrait.disabled) {
+    retrait.checked = false;
+  }
+}
+
 function formatAr(valeur) {
   return Number(valeur || 0).toLocaleString('fr-FR') + ' Ar';
 }
@@ -142,6 +157,8 @@ function calculer() {
 
   const valeur = Number(montant.value);
   const numero = telephone.value.replace(/\D/g, '');
+
+  synchroniserOptionRetrait();
 
   if (valeur <= 0 || numero.length !== 10) {
     reset();
@@ -188,6 +205,7 @@ function calculer() {
 montant.addEventListener('input', calculer);
 telephone.addEventListener('input', calculer);
 retrait.addEventListener('change', calculer);
+synchroniserOptionRetrait();
 </script>
 
 </body>

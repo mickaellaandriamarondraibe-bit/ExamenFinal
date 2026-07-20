@@ -1,9 +1,18 @@
 <aside class="sidebar">
     <div class="sidebar-logo">
-        MOBILE MONEY
+        <div class="sidebar-logo-icon">
+            <i class="bi bi-phone"></i>
+        </div>
+
+        <div>
+            <strong>Mobi Money</strong>
+            <span>Administration</span>
+        </div>
     </div>
 
     <nav class="sidebar-menu">
+        <div class="sidebar-section">Principal</div>
+
         <a href="<?= base_url('operateur/client') ?>" class="sidebar-link">
             <i class="bi bi-people"></i>
             <span>Clients</span>
@@ -18,6 +27,8 @@
             <i class="bi bi-arrow-left-right"></i>
             <span>Transactions</span>
         </a>
+
+        <div class="sidebar-section">Configuration</div>
 
         <a href="<?= base_url('operateur/types-operations') ?>" class="sidebar-link">
             <i class="bi bi-list-ul"></i>
