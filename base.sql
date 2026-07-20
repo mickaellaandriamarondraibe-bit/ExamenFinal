@@ -5,10 +5,27 @@ CREATE TABLE operateurs (
     mot_de_passe VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE autre_operateur(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom VARCHAR(100) NOT NULL
+);
+
+
+
 CREATE TABLE prefixes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     prefixe TEXT NOT NULL UNIQUE,
-    actif INTEGER NOT NULL DEFAULT 1
+    autre_operateur_id INTEGER ,
+    actif INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (autre_operateur_id) REFERENCES autre_operateur(id)
+);
+
+
+CREATE TABLE commissions_inter_operateurs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    autre_operateur_id INTEGER NOT NULL,
+    pourcentage REAL NOT NULL,
+    FOREIGN KEY (autre_operateur_id) REFERENCES autre_operateur(id)
 );
 
 CREATE TABLE types_operations (
@@ -70,9 +87,22 @@ CREATE TABLE transactions (
 
 
 
-INSERT INTO prefixes (prefixe) VALUES
-('033'),
-('037');
+
+
+-- Autres opérateurs
+INSERT INTO autre_operateur (nom) VALUES
+('Orange'),
+('Airtel');
+
+-- Préfixes des autres opérateurs
+INSERT INTO prefixes (prefixe, autre_operateur_id) VALUES
+('032', 1),  -- Orange
+('031', 2);  -- Airtel
+
+-- Commissions inter-opérateurs
+INSERT INTO commissions_inter_operateurs (autre_operateur_id, pourcentage) VALUES
+(1, 2.0),   -- 2% vers Orange
+(2, 2.5);   -- 2.5% vers Airtel
 
 INSERT INTO types_operations (libelle) VALUES
 ('DEPOT'),
@@ -89,3 +119,16 @@ VALUES (
     'admin@gmail.com',
     '$2y$10$/y57SG79ljn7/Z/u2maVhelpRLOVLvtrxKbLfRxA//mgSVgRNmOn2'
 );
+
+
+INSERT INTO baremes_frais (type_operation_id, montant_min, montant_max, frais)
+VALUES
+-- RETRAIT
+(2, 0, 100000, 500),
+(2, 100001, 1000000, 1000),
+
+-- TRANSFERT
+(3, 0, 100000, 1000),
+(3, 100001, 1000000, 2000);
+
+
