@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ERROR - 2026-07-20 07:44:51 --> Unable to prepare statement: no such column: clients.nom
 in SYSTEMPATH/Database/SQLite3/Connection.php on line 164.
  1 SYSTEMPATH/Database/SQLite3/Connection.php(164): SQLite3->query()
@@ -405,3 +406,5 @@ in APPPATH/Controllers/ClientController.php on line 26.
  5 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
  6 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
 >>>>>>> 1fd19ca (commit : clientController)
+=======
+>>>>>>> d2f8699 (client)
