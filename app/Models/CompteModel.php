@@ -29,5 +29,27 @@ class CompteModel extends Model
         return $this->where('client_id', $client_id)->first();
     }
 
-    
+    public function createCompte($client_id)
+    {
+        $numero_compte = $this->genererNumeroCompte();
+
+        $data = [
+            'client_id'     => $client_id,
+            'numero_compte' => $numero_compte,
+            'solde'         => 0,
+            'statut'        => 'ACTIF',
+        ];
+
+        return $this->insert($data);
+    }
+
+    private function genererNumeroCompte()
+    {
+        // Génère un numéro de compte unique, ex: CPT + timestamp + aléatoire
+        do {
+            $numero = 'CPT' . date('ymd') . rand(1000, 9999);
+        } while ($this->where('numero_compte', $numero)->first());
+
+        return $numero;
+    }
 }

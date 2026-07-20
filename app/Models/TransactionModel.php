@@ -55,12 +55,15 @@ class TransactionModel extends Model
         ]);
     }
 
-    public function getHistorique($compte_id){
-        return $this->groupStart()
-                    ->where('compte_source_id',$compte_id)
-                    ->orWhere('compte_destination_id',$compte_id)
-                    ->groupEnd()
-                    ->orderBy('date_transaction','DESC')
-                    ->findAll() ;
-    }
+    public function getHistorique($compte_id)
+{
+    return $this->select('transactions.*, types_operations.libelle AS type_operation')
+                ->join('types_operations', 'types_operations.id = transactions.type_operation_id')
+                ->groupStart()
+                    ->where('compte_source_id', $compte_id)
+                    ->orWhere('compte_destination_id', $compte_id)
+                ->groupEnd()
+                ->orderBy('date_transaction', 'DESC')
+                ->findAll();
+}
 }

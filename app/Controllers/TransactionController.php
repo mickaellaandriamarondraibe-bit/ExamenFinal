@@ -252,4 +252,40 @@ class TransactionController extends BaseController
 
         return view('transaction/transfert');
     }
+
+
+    // ==========================================
+    // HISTORIQUE
+    // ==========================================
+
+    public function historique()
+    {
+        $transactionModel = new TransactionModel();
+        $compteModel = new CompteModel();
+
+        $client_id = session()->get('client_id');
+
+        if (!$client_id) {
+            return redirect()->to('/');
+        }
+
+        $compte = $compteModel->getCompteByClientId($client_id);
+
+        if (!$compte) {
+            return redirect()->to('/')
+                ->with('error', 'Compte introuvable');
+        }
+
+        $transactionsBrutes = $transactionModel->getHistorique($compte['id']);
+
+        // Ajouter le champ "sens" (in/out) pour chaque transaction
+        $transactions = array_map(function ($t) use ($compte) {
+            $t['sens'] = ($t['compte_destination_id'] == $compte['id']) ? 'in' : 'out';
+            return $t;
+        }, $transactionsBrutes);
+
+        $data['transactions'] = $transactions;
+
+        return view('transaction/historique', $data);
+    }
 }

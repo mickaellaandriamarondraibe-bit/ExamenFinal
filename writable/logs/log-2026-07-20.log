@@ -345,3 +345,54 @@ DEBUG - 2026-07-20 08:12:28 --> Session: Class initialized using 'CodeIgniter\Se
 DEBUG - 2026-07-20 08:12:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2026-07-20 08:15:40 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2026-07-20 08:15:57 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-07-20 08:57:28 --> Error: Class "App\Controllers\CompteModel" not found
+[Method: POST, Route: login]
+in APPPATH/Controllers/ClientController.php on line 27.
+ 1 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\ClientController->login()
+ 2 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 3 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 4 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+ 6 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 08:59:39 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "templates/bottom_nav.php"
+[Method: GET, Route: accueil]
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 3 APPPATH/Views/dashboard/index.php(70): view()
+ 4 SYSTEMPATH/View/View.php(240): include('/home/idealy/Documents/S4/Sys Info Mr Rojo/ExamenFinal/app/Views/dashboard/index.php')
+ 5 SYSTEMPATH/View/View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 6 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 7 APPPATH/Controllers/DashboardController.php(28): view()
+ 8 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\DashboardController->index()
+ 9 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+10 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+11 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+13 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 09:05:45 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "templates/bottom_nav.php"
+[Method: GET, Route: accueil]
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(228): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 3 APPPATH/Views/dashboard/index.php(70): view()
+ 4 SYSTEMPATH/View/View.php(240): include('/home/idealy/Documents/S4/Sys Info Mr Rojo/ExamenFinal/app/Views/dashboard/index.php')
+ 5 SYSTEMPATH/View/View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 6 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 7 APPPATH/Controllers/DashboardController.php(28): view()
+ 8 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\DashboardController->index()
+ 9 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+10 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+11 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+13 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 09:25:36 --> CodeIgniter\Exceptions\BadMethodCallException: Call to undefined method App\Models\CompteModel::getCompteByTelephone
+[Method: POST, Route: transfert]
+in SYSTEMPATH/Model.php on line 761.
+ 1 APPPATH/Controllers/TransactionController.php(198): CodeIgniter\Model->__call()
+ 2 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\TransactionController->enregistrerTransfert()
+ 3 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 4 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 5 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+ 7 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()

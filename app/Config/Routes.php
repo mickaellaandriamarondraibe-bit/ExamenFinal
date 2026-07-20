@@ -44,3 +44,22 @@ $routes->post('login' , 'ClientController::login') ;
 
 /* Gain */
 $routes->get('gains', 'GainController::index');
+
+
+
+
+/* Client - vues côté client */
+$routes->get('accueil', 'DashboardController::index');
+
+$routes->get('depot', 'TransactionController::faireDepot');
+$routes->post('depot', 'TransactionController::enregistrerDepot');
+
+$routes->get('retrait', 'TransactionController::faireRetrait');
+$routes->post('retrait', 'TransactionController::enregistrerRetrait');
+
+$routes->get('transfert', 'TransactionController::faireTransfert');
+$routes->post('transfert', 'TransactionController::enregistrerTransfert');
+
+$routes->get('solde', 'ClientController::solde');
+
+$routes->get('historique', 'TransactionController::historique');
