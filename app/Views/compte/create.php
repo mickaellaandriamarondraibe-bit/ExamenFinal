@@ -29,6 +29,7 @@
             type="text"
             name="numero_compte"
             class="form-control"
+            placeholder="Exemple : 0331234567"
             required
         >
     </div>

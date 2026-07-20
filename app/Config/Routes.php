@@ -41,6 +41,7 @@ $routes->get('compte/delete/(:num)', 'CompteController::delete/$1');
 /* Client */
 $routes->get('/', 'ClientController::loginPage');
 $routes->post('login' , 'ClientController::login') ;
+$routes->get('client','ClientController::getAllclient');
 
 /* Gain */
 $routes->get('gains', 'GainController::index');

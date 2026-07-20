@@ -9,7 +9,7 @@
             <span>Tableau de bord</span>
         </a>
 
-        <a href="<?= base_url('clients') ?>" class="sidebar-link">
+        <a href="<?= base_url('client') ?>" class="sidebar-link">
             <i class="bi bi-people"></i>
             <span>Clients</span>
         </a>
@@ -42,11 +42,6 @@
         <a href="<?= base_url('gains') ?>" class="sidebar-link">
             <i class="bi bi-graph-up"></i>
             <span>Situation des gains</span>
-        </a>
-
-        <a href="<?= base_url('rapports') ?>" class="sidebar-link">
-            <i class="bi bi-file-earmark-text"></i>
-            <span>Rapports</span>
         </a>
 
         <a href="<?= base_url('parametres') ?>" class="sidebar-link">
