@@ -60,7 +60,7 @@
     <form action="<?= site_url('transfert') ?>" method="post">
 
       <?= csrf_field() ?>
-
+      
 
       <div class="field">
 
@@ -193,6 +193,9 @@
       <button type="submit" class="btn-primary">
         Confirmer le transfert
       </button>
+      <a href="<?= site_url('client/transfert-multiple') ?>" class="btn-secondary">
+  Transfert multiple
+</a>
 
     </form>
 
@@ -271,7 +274,7 @@ function calculerTransfert()
     donnees.append('montant', montant);
 
     donnees.append('telephone', telephone);
-
+    donnees.append('type_operation_id', 3);
     donnees.append(
       'prise_en_charge_commission',
       priseEnChargeCommission

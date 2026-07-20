@@ -435,32 +435,115 @@ public function enregistrerTransfert()
     }
 
 
+public function calculerFrais()
+{
+    $baremeFraisModel = new \App\Models\BaremeFraisModel();
+    $prefixModel = new \App\Models\PrefixModel();
+    $commissionModel = new \App\Models\CommissionInterOperateurModel();
 
-    public function calculerFrais()
-    {
-        $baremeFraisModel = new BaremeFraisModel();
+    $montant = (float) $this->request->getPost('montant');
 
-        $montant = (float) $this->request->getPost('montant');
-        $type_operation_id = (int) $this->request->getPost('type_operation_id');
+    $telephone = preg_replace(
+        '/\D/',
+        '',
+        (string) $this->request->getPost('telephone')
+    );
 
-        if ($montant <= 0) {
-            return $this->response->setJSON([
-                'frais' => 0,
-                'total' => 0,
-            ]);
-        }
+    $typeOperationId = (int) $this->request->getPost(
+        'type_operation_id'
+    );
 
-        $bareme = $baremeFraisModel->getFraisByMontant($type_operation_id, $montant);
-        $frais = $bareme ? (float) $bareme['frais'] : 0;
+    $priseEnChargeCommission =
+        $this->request->getPost('prise_en_charge_commission') ? 1 : 0;
 
+    if ($montant <= 0) {
         return $this->response->setJSON([
-            'frais'    => $frais,
-            'montant'  => $montant,
-            'total'    => $montant + $frais,   // pour retrait/transfert (débit)
-            'recevra'  => $montant,            // ce que le destinataire/le client reçoit
+            'error' => 'Montant invalide'
         ]);
     }
 
+    if (strlen($telephone) < 3) {
+        return $this->response->setJSON([
+            'error' => 'Numéro invalide'
+        ]);
+    }
+
+    $prefixe = substr($telephone, 0, 3);
+
+    $prefixData = $prefixModel
+        ->where('prefixe', $prefixe)
+        ->where('actif', 1)
+        ->first();
+
+    if (!$prefixData) {
+        return $this->response->setJSON([
+            'error' => 'Préfixe invalide'
+        ]);
+    }
+
+    $autreOperateurId = !empty(
+        $prefixData['autre_operateur_id']
+    )
+        ? (int) $prefixData['autre_operateur_id']
+        : null;
+
+    $baremeQuery = $baremeFraisModel
+        ->where('type_operation_id', $typeOperationId)
+        ->where('montant_min <=', $montant)
+        ->where('montant_max >=', $montant);
+
+    if ($autreOperateurId === null) {
+        $baremeQuery->where('autre_operateur_id', null);
+    } else {
+        $baremeQuery->where(
+            'autre_operateur_id',
+            $autreOperateurId
+        );
+    }
+
+    $bareme = $baremeQuery->first();
+
+    if (!$bareme) {
+        return $this->response->setJSON([
+            'error' => 'Aucun barème trouvé'
+        ]);
+    }
+
+    $frais = (float) $bareme['frais'];
+    $commission = 0;
+
+    if ($autreOperateurId !== null) {
+        $commissionData = $commissionModel
+            ->where(
+                'autre_operateur_id',
+                $autreOperateurId
+            )
+            ->first();
+
+        if ($commissionData) {
+            $pourcentage = (float) $commissionData['pourcentage'];
+
+            $commission = round(
+                $montant * $pourcentage / 100
+            );
+        }
+    }
+
+    if ($priseEnChargeCommission === 1) {
+        $montantRecu = $montant;
+        $totalADebiter = $montant + $frais + $commission;
+    } else {
+        $montantRecu = $montant - $commission;
+        $totalADebiter = $montant + $frais;
+    }
+
+    return $this->response->setJSON([
+        'frais'        => $frais,
+        'commission'   => $commission,
+        'montant_recu' => $montantRecu,
+        'total'        => $totalADebiter
+    ]);
+}
     public function historique2($id)
 {
     $transactionModel = new TransactionModel();
@@ -490,6 +573,356 @@ public function enregistrerTransfert()
     ];
 
     return view('transaction/historique2', $data);
+}
+
+public function transfertMultiple()
+{
+    return view('transaction/transfert_multiple');
+}
+
+    public function enregistrerTransfertMultiple()
+{
+    $compteModel = new \App\Models\CompteModel();
+    $prefixModel = new \App\Models\PrefixModel();
+    $baremeModel = new \App\Models\BaremeFraisModel();
+    $commissionModel = new \App\Models\CommissionInterOperateurModel();
+    $transactionModel = new \App\Models\TransactionModel();
+
+    $clientId = session()->get('client_id');
+
+    if (!$clientId) {
+        return redirect()->to('/');
+    }
+
+    $montantTotal = (int) $this->request->getPost('montant_total');
+
+    $telephones = $this->request->getPost('telephones');
+
+    $priseEnChargeCommission =
+        $this->request->getPost('prise_en_charge_commission') ? 1 : 0;
+
+    if ($montantTotal <= 0) {
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'Le montant total est invalide');
+    }
+
+    if (!is_array($telephones) || count($telephones) < 2) {
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                'Vous devez saisir au moins deux destinataires'
+            );
+    }
+
+    $telephonesNettoyes = [];
+
+    foreach ($telephones as $telephone) {
+        $telephone = preg_replace('/\D/', '', (string) $telephone);
+
+        if (strlen($telephone) !== 10) {
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Tous les numéros doivent contenir 10 chiffres'
+                );
+        }
+
+        $telephonesNettoyes[] = $telephone;
+    }
+
+    /*
+     * Éviter les numéros en double.
+     */
+    if (count($telephonesNettoyes) !== count(array_unique($telephonesNettoyes))) {
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                'Un même numéro ne peut pas être ajouté plusieurs fois'
+            );
+    }
+
+    $compteSource = $compteModel->getCompteByClientId($clientId);
+
+    if (!$compteSource) {
+        return redirect()->back()
+            ->with('error', 'Compte source introuvable');
+    }
+
+    $nombreDestinataires = count($telephonesNettoyes);
+
+    /*
+     * Division du montant total.
+     */
+    $montantBase = intdiv($montantTotal, $nombreDestinataires);
+    $reste = $montantTotal % $nombreDestinataires;
+
+    if ($montantBase <= 0) {
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                'Le montant total est trop faible pour ce nombre de destinataires'
+            );
+    }
+
+    $typeOperationId = 3;
+
+    $detailsTransferts = [];
+
+    $autreOperateurCommun = null;
+    $premierOperateurDefini = false;
+
+    $totalFrais = 0;
+    $totalCommission = 0;
+    $totalMontantRecu = 0;
+
+    foreach ($telephonesNettoyes as $index => $telephone) {
+        /*
+         * Le reste est ajouté au premier destinataire.
+         */
+        $montantIndividuel = $montantBase;
+
+        if ($index === 0) {
+            $montantIndividuel += $reste;
+        }
+
+        $prefixe = substr($telephone, 0, 3);
+
+        $prefixData = $prefixModel
+            ->where('prefixe', $prefixe)
+            ->where('actif', 1)
+            ->first();
+
+        if (!$prefixData) {
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Le préfixe du numéro ' . $telephone . ' est invalide'
+                );
+        }
+
+        $autreOperateurId = !empty($prefixData['autre_operateur_id'])
+            ? (int) $prefixData['autre_operateur_id']
+            : null;
+
+        /*
+         * Tous les numéros doivent appartenir au même opérateur.
+         */
+        if (!$premierOperateurDefini) {
+            $autreOperateurCommun = $autreOperateurId;
+            $premierOperateurDefini = true;
+        } elseif ($autreOperateurId !== $autreOperateurCommun) {
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Tous les destinataires doivent appartenir au même opérateur'
+                );
+        }
+
+        $compteDestination = $compteModel
+            ->getCompteByTelephone($telephone);
+
+        if (!$compteDestination) {
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Le compte correspondant au numéro '
+                    . $telephone
+                    . ' est introuvable'
+                );
+        }
+
+        if ((int) $compteDestination['id'] === (int) $compteSource['id']) {
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Votre propre numéro ne peut pas être destinataire'
+                );
+        }
+
+        /*
+         * Recherche du barème avec le montant individuel.
+         */
+        $baremeQuery = $baremeModel
+            ->where('type_operation_id', $typeOperationId)
+            ->where('montant_min <=', $montantIndividuel)
+            ->where('montant_max >=', $montantIndividuel);
+
+        if ($autreOperateurId === null) {
+            $baremeQuery->where('autre_operateur_id', null);
+        } else {
+            $baremeQuery->where(
+                'autre_operateur_id',
+                $autreOperateurId
+            );
+        }
+
+        $bareme = $baremeQuery->first();
+
+        if (!$bareme) {
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Aucun barème ne correspond au montant '
+                    . number_format($montantIndividuel, 0, ',', ' ')
+                    . ' Ar'
+                );
+        }
+
+        $frais = (int) $bareme['frais'];
+
+        $commission = 0;
+
+        if ($autreOperateurId !== null) {
+            $commissionData = $commissionModel
+                ->where(
+                    'autre_operateur_id',
+                    $autreOperateurId
+                )
+                ->first();
+
+            if (!$commissionData) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with(
+                        'error',
+                        'Commission inter-opérateur non configurée'
+                    );
+            }
+
+            $pourcentage = (float) $commissionData['pourcentage'];
+
+            $commission = (int) round(
+                $montantIndividuel * $pourcentage / 100
+            );
+        }
+
+        if ($priseEnChargeCommission === 1) {
+            $montantRecu = $montantIndividuel;
+        } else {
+            $montantRecu = $montantIndividuel - $commission;
+        }
+
+        if ($montantRecu <= 0) {
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'La commission est trop élevée pour le numéro '
+                    . $telephone
+                );
+        }
+
+        $totalFrais += $frais;
+        $totalCommission += $commission;
+        $totalMontantRecu += $montantRecu;
+
+        $detailsTransferts[] = [
+            'telephone'          => $telephone,
+            'compte_destination' => $compteDestination,
+            'montant'            => $montantIndividuel,
+            'montant_recu'       => $montantRecu,
+            'frais'              => $frais,
+            'commission'         => $commission,
+            'autre_operateur_id' => $autreOperateurId
+        ];
+    }
+
+    /*
+     * Calcul du total à débiter.
+     */
+    if ($priseEnChargeCommission === 1) {
+        $totalADebiter =
+            $montantTotal
+            + $totalFrais
+            + $totalCommission;
+    } else {
+        $totalADebiter =
+            $montantTotal
+            + $totalFrais;
+    }
+
+    if ((int) $compteSource['solde'] < $totalADebiter) {
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                'Solde insuffisant. Total requis : '
+                . number_format($totalADebiter, 0, ',', ' ')
+                . ' Ar'
+            );
+    }
+
+    /*
+     * Toutes les opérations doivent réussir ensemble.
+     */
+    $db = db_connect();
+    $db->transStart();
+
+    foreach ($detailsTransferts as $detail) {
+        $transactionModel->enregistrerTransfertMultiple(
+            $compteSource['id'],
+            $detail['compte_destination']['id'],
+            $typeOperationId,
+            $detail['montant'],
+            $detail['montant_recu'],
+            $detail['frais'],
+            $detail['commission'],
+            $priseEnChargeCommission,
+            $detail['autre_operateur_id']
+        );
+
+        $nouveauSoldeDestination =
+            (int) $detail['compte_destination']['solde']
+            + $detail['montant_recu'];
+
+        $compteModel->update(
+            $detail['compte_destination']['id'],
+            [
+                'solde' => $nouveauSoldeDestination
+            ]
+        );
+    }
+
+    /*
+     * Le compte source est débité une seule fois.
+     */
+    $compteModel->update(
+        $compteSource['id'],
+        [
+            'solde' => (int) $compteSource['solde'] - $totalADebiter
+        ]
+    );
+
+    $db->transComplete();
+
+    if ($db->transStatus() === false) {
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                "Une erreur est survenue pendant l'envoi multiple"
+            );
+    }
+
+    return redirect()->to('/accueil')
+        ->with(
+            'success',
+            'Transfert multiple effectué vers '
+            . $nombreDestinataires
+            . ' destinataires. Total débité : '
+            . number_format($totalADebiter, 0, ',', ' ')
+            . ' Ar'
+        );
 }
 public function getHistorique($compte_id)
 {
