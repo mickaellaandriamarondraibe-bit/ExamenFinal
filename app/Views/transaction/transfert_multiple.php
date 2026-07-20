@@ -539,17 +539,22 @@
                 ></div>
             </div>
 
-            <div class="commission-option">
+           <div class="commission-option">
+    <label class="checkbox-line">
+        <input
+            type="checkbox"
+            name="inclure_frais_retrait"
+            id="inclure_frais_retrait"
+            value="1"
+            <?= old('inclure_frais_retrait') ? 'checked' : '' ?>
+        >
+        <span>Inclure les frais de retrait</span>
+    </label>
 
-                <label class="checkbox-line">
-                   <input
-    type="checkbox"
-    name="inclure_frais_retrait"
-    id="inclure_frais_retrait"
-    value="1"
->
-
-<span>Inclure les frais de retrait</span>
+    <p class="commission-description">
+        Les frais de retrait seront ajoutés au total débité.
+    </p>
+</div>
                 </label>
 
                 <p class="commission-description">
@@ -948,7 +953,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 'resume-frais'
             ).textContent =
                 formaterMontant(resultat.total_frais);
-
+            document.getElementById(
+    'resume-frais-retrait'
+).textContent =
+    formaterMontant(resultat.total_frais_retrait);
             document.getElementById(
                 'resume-commission'
             ).textContent =
