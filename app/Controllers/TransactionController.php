@@ -432,7 +432,7 @@ class TransactionController extends BaseController
     {
         $baremeModel = new BaremeFraisModel();
         $commissionModel = new CommissionInterOperateurModel();
-        $baremeTransfert = $baremeModel->getFraisByMontant(3, $montant, $autreOperateurId);
+        $baremeTransfert = $baremeModel->getFraisByMontant(3, $montant, null);
 
         if (!$baremeTransfert) {
             return ['erreur' => 'Barème de transfert introuvable'];
