@@ -18,7 +18,30 @@
 type="text"
 name="prefixe"
 class="form-control"
+placeholder="Ex : 033"
 required>
+
+</div>
+
+<div class="mb-3">
+
+<label>Opérateur</label>
+
+<select name="autre_operateur_id" class="form-select">
+
+<option value="">Notre opérateur</option>
+
+<?php foreach ($autresOperateurs as $operateur): ?>
+<option value="<?= esc($operateur['id']) ?>">
+<?= esc($operateur['nom']) ?>
+</option>
+<?php endforeach; ?>
+
+</select>
+
+<div class="form-text">
+Choisir "Notre opérateur" pour les préfixes internes comme 033 ou 037.
+</div>
 
 </div>
 

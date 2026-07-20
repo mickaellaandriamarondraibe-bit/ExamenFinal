@@ -25,6 +25,32 @@ required>
 
 <div class="mb-3">
 
+<label>Opérateur</label>
+
+<select name="autre_operateur_id" class="form-select">
+
+<option value="" <?= empty($prefix['autre_operateur_id']) ? 'selected' : '' ?>>
+Notre opérateur
+</option>
+
+<?php foreach ($autresOperateurs as $operateur): ?>
+<option
+value="<?= esc($operateur['id']) ?>"
+<?= $prefix['autre_operateur_id'] == $operateur['id'] ? 'selected' : '' ?>>
+<?= esc($operateur['nom']) ?>
+</option>
+<?php endforeach; ?>
+
+</select>
+
+<div class="form-text">
+Choisir "Notre opérateur" pour les préfixes internes comme 033 ou 037.
+</div>
+
+</div>
+
+<div class="mb-3">
+
 <label>Etat</label>
 
 <select name="actif" class="form-select">

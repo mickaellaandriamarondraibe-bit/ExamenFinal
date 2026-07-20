@@ -23,6 +23,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Préfixe</th>
+                    <th>Opérateur</th>
                     <th>État</th>
                     <th>Actions</th>
                 </tr>
@@ -36,6 +37,14 @@
                             <td><?= esc($prefixe['id']) ?></td>
 
                             <td><?= esc($prefixe['prefixe']) ?></td>
+
+                            <td>
+                                <?php if (empty($prefixe['nom_autre_operateur'])): ?>
+                                    Notre opérateur
+                                <?php else: ?>
+                                    <?= esc($prefixe['nom_autre_operateur']) ?>
+                                <?php endif; ?>
+                            </td>
 
                             <td>
                                 <?php if ($prefixe['actif'] == 1): ?>
@@ -62,7 +71,7 @@
                 <?php else: ?>
 
                     <tr>
-                        <td colspan="4" class="text-center">
+                        <td colspan="5" class="text-center">
                             Aucun préfixe trouvé.
                         </td>
                     </tr>

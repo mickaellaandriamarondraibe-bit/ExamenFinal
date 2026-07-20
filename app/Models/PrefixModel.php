@@ -11,6 +11,7 @@ class PrefixModel extends Model
 
     protected $allowedFields = [
         'prefixe',
+        'autre_operateur_id',
         'actif'
     ];
 
