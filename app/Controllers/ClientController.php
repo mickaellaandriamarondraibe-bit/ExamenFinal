@@ -55,4 +55,5 @@ class ClientController extends BaseController
 
     return view('auth/welcom');
 }
+
 }

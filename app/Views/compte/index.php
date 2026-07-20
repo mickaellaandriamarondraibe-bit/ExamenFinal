@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-<div class="d-flex justify-content-between mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Comptes clients</h2>
 
     <a href="<?= base_url('compte/create') ?>" class="btn btn-primary">
@@ -27,14 +27,11 @@
             <tr>
                 <td><?= $compte['id'] ?></td>
 
-                <td>
-                    <?= esc($compte['nom']) ?>
-                    <?= esc($compte['prenom']) ?>
-                </td>
+                <td><?= esc($compte['telephone']) ?></td>
 
                 <td><?= esc($compte['numero_compte']) ?></td>
 
-                <td><?= $compte['solde'] ?> Ar</td>
+                <td><?= number_format($compte['solde'], 0, ',', ' ') ?> Ar</td>
 
                 <td>
                     <?= $compte['actif'] == 1 ? 'Actif' : 'Inactif' ?>

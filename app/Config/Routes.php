@@ -5,7 +5,6 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
 
 /* CRUD prefixe */
 $routes->get('prefixes', 'PrefixController::index');
@@ -32,9 +31,16 @@ $routes->post('baremes-frais/update/(:num)', 'BaremeFraisController::update/$1')
 $routes->get('baremes-frais/delete/(:num)', 'BaremeFraisController::delete/$1');
 
 /* CRUD compte */
-$routes->get('comptes', 'CompteController::index');
+$routes->get('compte', 'CompteController::index');
 $routes->get('compte/create', 'CompteController::create');
 $routes->post('compte/store', 'CompteController::store');
 $routes->get('compte/edit/(:num)', 'CompteController::edit/$1');
 $routes->post('compte/update/(:num)', 'CompteController::update/$1');
 $routes->get('compte/delete/(:num)', 'CompteController::delete/$1');
+
+/* Client */
+$routes->get('/', 'ClientController::loginPage');
+$routes->post('login' , 'ClientController::login') ;
+
+/* Gain */
+$routes->get('gains', 'GainController::index');

@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-<h2>Modifier un compte</h2>
+<h2 class="mb-3">Modifier un compte</h2>
 
 <form
     action="<?= base_url('compte/update/' . $compte['id']) ?>"
@@ -20,8 +20,7 @@
                     value="<?= $client['id'] ?>"
                     <?= $client['id'] == $compte['client_id'] ? 'selected' : '' ?>
                 >
-                    <?= esc($client['nom']) ?>
-                    <?= esc($client['prenom']) ?>
+                    <?= esc($client['telephone']) ?>
                 </option>
             <?php endforeach; ?>
         </select>
@@ -47,6 +46,7 @@
             name="solde"
             class="form-control"
             value="<?= $compte['solde'] ?>"
+            min="0"
             required
         >
     </div>
@@ -54,12 +54,18 @@
     <div class="mb-3">
         <label class="form-label">État</label>
 
-        <select name="actif" class="form-select">
-            <option value="1" <?= $compte['actif'] == 1 ? 'selected' : '' ?>>
+        <select name="actif" class="form-select" required>
+            <option
+                value="1"
+                <?= $compte['actif'] == 1 ? 'selected' : '' ?>
+            >
                 Actif
             </option>
 
-            <option value="0" <?= $compte['actif'] == 0 ? 'selected' : '' ?>>
+            <option
+                value="0"
+                <?= $compte['actif'] == 0 ? 'selected' : '' ?>
+            >
                 Inactif
             </option>
         </select>

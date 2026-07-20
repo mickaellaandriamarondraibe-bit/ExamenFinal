@@ -2,61 +2,70 @@
 
 <?= $this->section('content') ?>
 
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between mb-3">
-        <h3>Configuration des préfixes</h3>
-
-        <a href="<?= base_url('prefixes/create') ?>" class="btn btn-primary">
-            Nouveau préfixe
-        </a>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Configuration des préfixes</h1>
+        <div class="page-subtitle">
+            Gestion des préfixes téléphoniques autorisés
+        </div>
     </div>
 
-    <table class="table table-bordered table-hover">
+    <a href="<?= base_url('prefixes/create') ?>" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i>
+        Nouveau préfixe
+    </a>
+</div>
 
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Préfixe</th>
-                <th>Etat</th>
-                <th width="180">Actions</th>
-            </tr>
-        </thead>
+<div class="content-card">
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Préfixe</th>
+                    <th>État</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
 
-        <tbody>
+            <tbody>
+                <?php foreach ($prefixes as $prefixe): ?>
+                    <tr>
+                        <td><?= $prefixe['id'] ?></td>
 
-        <?php foreach($prefixes as $prefix): ?>
+                        <td><?= esc($prefixe['prefixe']) ?></td>
 
-            <tr>
+                        <td>
+                            <?php if ($prefixe['actif'] == 1): ?>
+                                <span class="status-active">Actif</span>
+                            <?php else: ?>
+                                <span class="status-inactive">Inactif</span>
+                            <?php endif; ?>
+                        </td>
 
-                <td><?= $prefix['id'] ?></td>
+                        <td>
+                            <a
+                                href="<?= base_url('prefixes/edit/' . $prefixe['id']) ?>"
+                                class="btn btn-warning btn-sm"
+                            >
+                                <i class="bi bi-pencil"></i>
+                                Modifier
+                            </a>
 
-                <td><?= $prefix['prefixe'] ?></td>
-
-                <td>
-                    <?= $prefix['actif'] ? 'Actif' : 'Inactif' ?>
-                </td>
-
-                <td>
-
-                    <a href="<?= base_url('prefixes/edit/'.$prefix['id']) ?>" class="btn btn-warning btn-sm">
-                        Modifier
-                    </a>
-
-                    <a href="<?= base_url('prefixes/delete/'.$prefix['id']) ?>" class="btn btn-danger btn-sm">
-                        Supprimer
-                    </a>
-
-                </td>
-
-            </tr>
-
-        <?php endforeach; ?>
-
-        </tbody>
-
-    </table>
-
+                            <a
+                                href="<?= base_url('prefixes/delete/' . $prefixe['id']) ?>"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Supprimer ce préfixe ?')"
+                            >
+                                <i class="bi bi-trash"></i>
+                                Supprimer
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <?= $this->endSection() ?>

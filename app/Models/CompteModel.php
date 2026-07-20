@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use App\Models\ClientModel;
 
 class CompteModel extends Model
 {
@@ -20,7 +21,7 @@ class CompteModel extends Model
     public function getAllWithClient()
     {
         return $this
-            ->select('comptes.*, clients.nom, clients.prenom')
+            ->select('comptes.*')
             ->join('clients', 'clients.id = comptes.client_id')
             ->findAll();
     }

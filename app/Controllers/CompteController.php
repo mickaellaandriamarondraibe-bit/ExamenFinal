@@ -81,4 +81,5 @@ class CompteController extends BaseController
 
         return redirect()->to('/compte');
     }
+
 }

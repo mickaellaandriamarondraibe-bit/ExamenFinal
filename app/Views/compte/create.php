@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-<h2>Ajouter un compte</h2>
+<h2 class="mb-3">Ajouter un compte</h2>
 
 <form action="<?= base_url('compte/store') ?>" method="post">
 
@@ -16,8 +16,7 @@
 
             <?php foreach ($clients as $client): ?>
                 <option value="<?= $client['id'] ?>">
-                    <?= esc($client['nom']) ?>
-                    <?= esc($client['prenom']) ?>
+                    <?= esc($client['telephone']) ?>
                 </option>
             <?php endforeach; ?>
         </select>
@@ -42,6 +41,7 @@
             name="solde"
             class="form-control"
             value="0"
+            min="0"
             required
         >
     </div>
