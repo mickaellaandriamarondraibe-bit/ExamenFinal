@@ -129,3 +129,27 @@ function warning(message){
     showToast(message,"warning");
 
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const currentPath = window.location.pathname;
+    const links = document.querySelectorAll('.sidebar-link');
+
+    links.forEach(function (link) {
+        const linkPath = new URL(link.href).pathname;
+
+        if (
+            currentPath === linkPath ||
+            currentPath.startsWith(linkPath + '/')
+        ) {
+            link.classList.add('active');
+        }
+
+        link.addEventListener('click', function () {
+            links.forEach(function (item) {
+                item.classList.remove('active');
+            });
+
+            link.classList.add('active');
+        });
+    });
+});

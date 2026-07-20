@@ -5,3 +5,21 @@
 4. creation de dossier prefixes dans view
 5. creation des css , layout , header , footer , sidebar 
 
+
+1.creation de 
+
+PrefixModel.php
+TypeOperationModel.php
+BaremeFraisModel.php
+CompteModel.php
+TransactionModel.php
+
+
+PrefixController.php
+TypeOperationController.php
+BaremeFraisController.php
+DashboardController.php
+
+
+
+
