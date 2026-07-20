@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobi Money — Connexion</title>
+<title>Mobile Money — Connexion</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
@@ -19,7 +19,7 @@
           <line x1="12" y1="18" x2="12.01" y2="18"/>
         </svg>
       </div>
-      <div class="brand">MOBI MONEY</div>
+      <div class="brand">Mobile Money</div>
       <div class="tagline">Votre argent, partout.</div>
 
       <?php if (session()->getFlashdata('error')) : ?>

@@ -3,29 +3,25 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
-use App\Models\TransactionModel;
-use App\Models\CompteModel;
 use App\Models\BaremeFraisModel;
+use App\Models\CommissionInterOperateurModel;
+use App\Models\CompteModel;
+use App\Models\PrefixModel;
+use App\Models\TransactionModel;
 
 class TransactionController extends BaseController
 {
-
-     public function index()
+    public function index()
     {
         $transactionModel = new TransactionModel();
 
         $data = [
             'title' => 'Liste des transactions',
-            'transactions' => $transactionModel
-                ->orderBy('date_transaction', 'DESC')
-                ->findAll()
+            'transactions' => $transactionModel->orderBy('date_transaction', 'DESC')->findAll(),
         ];
 
         return view('transaction/all', $data);
     }
-
-    // DEPOT
-
 
     public function faireDepot()
     {
@@ -34,63 +30,40 @@ class TransactionController extends BaseController
 
     public function enregistrerDepot()
     {
-        $transactionModel = new TransactionModel();
-        $compteModel = new CompteModel();
-        $baremeFraisModel = new BaremeFraisModel();
-
-        if ($this->request->is('post')) {
-
-            $montant = $this->request->getPost('montant');
-            $client_id = session()->get('client_id');
-
-            if (!$client_id) {
-                return redirect()->to('/');
-            }
-
-            if (!$montant || $montant <= 0) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Montant invalide');
-            }
-
-            $compte = $compteModel->getCompteByClientId($client_id);
-
-            if (!$compte) {
-                return redirect()->back()
-                    ->with('error', 'Compte introuvable');
-            }
-
-            $type_operation_id = 1; // DEPOT
-
-            $bareme = $baremeFraisModel->getFraisByMontant($type_operation_id, $montant);
-            $frais = $bareme ? $bareme['frais'] : 0;
-
-            $insertedId = $transactionModel->enregistrerDepot(
-                $compte['id'],
-                $type_operation_id,
-                $montant,
-                $frais
-            );
-
-            if (!$insertedId) {
-                return redirect()->back()
-                    ->with('error', "Erreur lors de l'enregistrement de la transaction");
-            }
-
-            
-            $nouveauSolde = $compte['solde'] + $montant;
-            $compteModel->update($compte['id'], ['solde' => $nouveauSolde]);
-
-            return redirect()->to('/solde')
-                ->with('success', 'Dépôt de ' . $montant . ' Ar effectué avec succès');
+        if (!$this->request->is('post')) {
+            return view('transaction/depot');
         }
 
-        return view('transaction/depot');
+        $clientId = session()->get('client_id');
+        $montant = (float) $this->request->getPost('montant');
+
+        if (!$clientId) {
+            return redirect()->to('/');
+        }
+
+        if ($montant <= 0) {
+            return $this->retourErreur('Montant invalide');
+        }
+
+        $compteModel = new CompteModel();
+        $transactionModel = new TransactionModel();
+        $compte = $compteModel->getCompteByClientId($clientId);
+
+        if (!$compte) {
+            return redirect()->back()->with('error', 'Compte introuvable');
+        }
+
+        $frais = $this->getFrais(1, $montant);
+        $insertedId = $transactionModel->enregistrerDepot($compte['id'], 1, $montant, $frais);
+
+        if (!$insertedId) {
+            return redirect()->back()->with('error', "Erreur lors de l'enregistrement de la transaction");
+        }
+
+        $this->crediterCompte($compteModel, $compte, $montant);
+
+        return redirect()->to('/solde')->with('success', 'Dépôt de ' . $montant . ' Ar effectué avec succès');
     }
-
- 
-    // RETRAIT
-
 
     public function faireRetrait()
     {
@@ -99,580 +72,547 @@ class TransactionController extends BaseController
 
     public function enregistrerRetrait()
     {
-        $transactionModel = new TransactionModel();
-        $compteModel = new CompteModel();
-        $baremeFraisModel = new BaremeFraisModel();
-
-        if ($this->request->is('post')) {
-
-            $montant = $this->request->getPost('montant');
-            $client_id = session()->get('client_id');
-
-            if (!$client_id) {
-                return redirect()->to('/');
-            }
-
-            if (!$montant || $montant <= 0) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Montant invalide');
-            }
-
-            $compte = $compteModel->getCompteByClientId($client_id);
-
-            if (!$compte) {
-                return redirect()->back()
-                    ->with('error', 'Compte introuvable');
-            }
-
-            $type_operation_id = 2; // RETRAIT
-
-            $bareme = $baremeFraisModel->getFraisByMontant($type_operation_id, $montant);
-            $frais = $bareme ? $bareme['frais'] : 0;
-
-            $totalADebiter = $montant + $frais;
-
-            // Vérifier que le solde est suffisant (montant + frais)
-            if ($compte['solde'] < $totalADebiter) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with('error', 'Solde insuffisant (montant + frais requis : ' . $totalADebiter . ' Ar)');
-            }
-
-            $insertedId = $transactionModel->enregistrerRetrait(
-                $compte['id'],
-                $type_operation_id,
-                $montant,
-                $frais
-            );
-
-            if (!$insertedId) {
-                return redirect()->back()
-                    ->with('error', "Erreur lors de l'enregistrement de la transaction");
-            }
-
-            // Débiter le compte (montant + frais)
-            $nouveauSolde = $compte['solde'] - $totalADebiter;
-            $compteModel->update($compte['id'], ['solde' => $nouveauSolde]);
-
-            return redirect()->to('/solde')
-                ->with('success', 'Retrait de ' . $montant . ' Ar effectué avec succès (frais : ' . $frais . ' Ar)');
+        if (!$this->request->is('post')) {
+            return view('transaction/retrait');
         }
 
-        return view('transaction/retrait');
+        $clientId = session()->get('client_id');
+        $montant = (float) $this->request->getPost('montant');
+
+        if (!$clientId) {
+            return redirect()->to('/');
+        }
+
+        if ($montant <= 0) {
+            return $this->retourErreur('Montant invalide');
+        }
+
+        $compteModel = new CompteModel();
+        $transactionModel = new TransactionModel();
+        $compte = $compteModel->getCompteByClientId($clientId);
+
+        if (!$compte) {
+            return redirect()->back()->with('error', 'Compte introuvable');
+        }
+
+        $frais = $this->getFrais(2, $montant);
+        $total = $montant + $frais;
+
+        if ($compte['solde'] < $total) {
+            return $this->retourErreur('Solde insuffisant (montant + frais requis : ' . $total . ' Ar)');
+        }
+
+        $insertedId = $transactionModel->enregistrerRetrait($compte['id'], 2, $montant, $frais);
+
+        if (!$insertedId) {
+            return redirect()->back()->with('error', "Erreur lors de l'enregistrement de la transaction");
+        }
+
+        $this->debiterCompte($compteModel, $compte, $total);
+
+        return redirect()->to('/solde')->with('success', 'Retrait de ' . $montant . ' Ar effectué avec succès (frais : ' . $frais . ' Ar)');
     }
-
-
-    // TRANSFERT
-
 
     public function faireTransfert()
     {
         return view('transaction/transfert');
     }
 
-public function enregistrerTransfert()
-{
-    $compteModel = new CompteModel();
-    $prefixModel = new \App\Models\PrefixModel();
-    $transactionModel = new TransactionModel();
-    $baremeModel = new BaremeFraisModel();
-    $commissionModel = new \App\Models\CommissionInterOperateurModel();
-
-    $clientId = session()->get('client_id');
-    $montant = (float) $this->request->getPost('montant');
-    $telephone = preg_replace(
-        '/\D/',
-        '',
-        (string) $this->request->getPost('telephone')
-    );
-    $inclureRetrait =
-        $this->request->getPost('inclure_frais_retrait') ? 1 : 0;
-
-    if (!$clientId) {
-        return redirect()->to('/');
-    }
-
-    if ($montant <= 0 || strlen($telephone) !== 10) {
-        return redirect()->back()->withInput()
-            ->with('error', 'Données invalides');
-    }
-
-    $source = $compteModel->getCompteByClientId($clientId);
-    $destination = $compteModel->getCompteByTelephone($telephone);
-    $prefixe = $prefixModel->findByPrefixe(substr($telephone, 0, 3));
-
-    if (
-        !$source ||
-        !$destination ||
-        !$prefixe ||
-        $source['id'] == $destination['id']
-    ) {
-        return redirect()->back()->withInput()
-            ->with('error', 'Destinataire invalide');
-    }
-
-    $autreOperateurId = empty($prefixe['autre_operateur_id'])
-        ? null
-        : (int) $prefixe['autre_operateur_id'];
-
-    $baremeTransfert = $baremeModel->getFraisByMontant(
-        3,
-        $montant,
-        $autreOperateurId
-    );
-
-    if (!$baremeTransfert) {
-        return redirect()->back()->withInput()
-            ->with('error', 'Barème de transfert introuvable');
-    }
-
-    $frais = (float) $baremeTransfert['frais'];
-    $fraisRetrait = 0;
-
-    if ($inclureRetrait) {
-        $baremeRetrait = $baremeModel->getFraisByMontant(
-            2,
-            $montant,
-            $autreOperateurId
-        );
-
-        if (!$baremeRetrait) {
-            return redirect()->back()->withInput()
-                ->with('error', 'Barème de retrait introuvable');
-        }
-
-        $fraisRetrait = (float) $baremeRetrait['frais'];
-    }
-
-    $commission = 0;
-
-    if ($autreOperateurId !== null) {
-        $commissionData = $commissionModel
-            ->where('autre_operateur_id', $autreOperateurId)
-            ->first();
-
-        if (!$commissionData) {
-            return redirect()->back()->withInput()
-                ->with('error', 'Commission introuvable');
-        }
-
-        $commission = round(
-            $montant * (float) $commissionData['pourcentage'] / 100
-        );
-    }
-
-    $totalADebiter =
-        $montant +
-        $frais +
-        $fraisRetrait +
-        $commission;
-
-    if ($source['solde'] < $totalADebiter) {
-        return redirect()->back()->withInput()
-            ->with('error', 'Solde insuffisant');
-    }
-
-    $db = db_connect();
-    $db->transStart();
-
-    $transactionModel->enregistrerTransfert(
-        $source['id'],
-        $destination['id'],
-        3,
-        $montant,
-        $montant,
-        $frais,
-        $fraisRetrait,
-        $commission,
-        $inclureRetrait,
-        $autreOperateurId
-    );
-
-    $compteModel->update($source['id'], [
-        'solde' => $source['solde'] - $totalADebiter
-    ]);
-
-    $compteModel->update($destination['id'], [
-        'solde' => $destination['solde'] + $montant
-    ]);
-
-    $db->transComplete();
-
-    if (!$db->transStatus()) {
-        return redirect()->back()->withInput()
-            ->with('error', 'Erreur pendant le transfert');
-    }
-
-    return redirect()->to('/solde')
-        ->with('success', 'Transfert effectué avec succès');
-}
-
-    // HISTORIQUE
-
-
-    public function historique()
+    public function enregistrerTransfert()
     {
-        $transactionModel = new TransactionModel();
-        $compteModel = new CompteModel();
+        $clientId = session()->get('client_id');
+        $montant = (float) $this->request->getPost('montant');
+        $telephone = $this->nettoyerTelephone($this->request->getPost('telephone'));
+        $inclureRetrait = $this->request->getPost('inclure_frais_retrait') ? 1 : 0;
 
-        $client_id = session()->get('client_id');
-
-        if (!$client_id) {
+        if (!$clientId) {
             return redirect()->to('/');
         }
 
-        $compte = $compteModel->getCompteByClientId($client_id);
-
-        if (!$compte) {
-            return redirect()->to('/')
-                ->with('error', 'Compte introuvable');
+        if ($montant <= 0 || strlen($telephone) !== 10) {
+            return $this->retourErreur('Données invalides');
         }
 
-        $transactionsBrutes = $transactionModel->getHistorique($compte['id']);
+        $compteModel = new CompteModel();
+        $transactionModel = new TransactionModel();
+        $source = $compteModel->getCompteByClientId($clientId);
+        $destination = $this->getDestinataire($compteModel, new PrefixModel(), $telephone, $source);
 
-        // Ajouter le champ "sens" (in/out) pour chaque transaction
-        $transactions = array_map(function ($t) use ($compte) {
-            $t['sens'] = ($t['compte_destination_id'] == $compte['id']) ? 'in' : 'out';
-            return $t;
-        }, $transactionsBrutes);
+        if (isset($destination['erreur'])) {
+            return $this->retourErreur($destination['erreur']);
+        }
 
-        $data['transactions'] = $transactions;
+        $couts = $this->calculerCoutsTransfert($montant, $destination['autre_operateur_id'], $inclureRetrait, true);
+
+        if (isset($couts['erreur'])) {
+            return $this->retourErreur($couts['erreur']);
+        }
+
+        if ($source['solde'] < $couts['total']) {
+            return $this->retourErreur('Solde insuffisant');
+        }
+
+        $db = db_connect();
+        $db->transStart();
+
+        $transactionModel->enregistrerTransfert($source['id'], $destination['compte']['id'], 3, $montant, $couts['montant_recu'], $couts['frais_total'], $couts['commission'], 1, $destination['autre_operateur_id']);
+        $this->debiterCompte($compteModel, $source, $couts['total']);
+        $this->crediterCompte($compteModel, $destination['compte'], $couts['montant_recu']);
+
+        $db->transComplete();
+
+        if (!$db->transStatus()) {
+            return $this->retourErreur('Erreur pendant le transfert');
+        }
+
+        return redirect()->to('/solde')->with('success', 'Transfert effectué avec succès');
+    }
+
+    public function historique()
+    {
+        $clientId = session()->get('client_id');
+
+        if (!$clientId) {
+            return redirect()->to('/');
+        }
+
+        $compteModel = new CompteModel();
+        $compte = $compteModel->getCompteByClientId($clientId);
+
+        if (!$compte) {
+            return redirect()->to('/')->with('error', 'Compte introuvable');
+        }
+
+        $data['transactions'] = $this->getHistoriqueAvecSens($compte);
 
         return view('transaction/historique', $data);
     }
 
+    public function calculerFrais()
+    {
+        $montant = (float) $this->request->getPost('montant');
+        $typeOperationId = (int) $this->request->getPost('type_operation_id');
 
-public function calculerFrais()
-{
-    $baremeFraisModel = new \App\Models\BaremeFraisModel();
-    $prefixModel = new \App\Models\PrefixModel();
-    $commissionModel = new \App\Models\CommissionInterOperateurModel();
-
-    $montant = (float) $this->request->getPost('montant');
-
-    $telephone = preg_replace(
-        '/\D/',
-        '',
-        (string) $this->request->getPost('telephone')
-    );
-
-    $typeOperationId = (int) $this->request->getPost(
-        'type_operation_id'
-    );
-
-    $priseEnChargeCommission =
-        $this->request->getPost('prise_en_charge_commission') ? 1 : 0;
-
-    if ($montant <= 0) {
-        return $this->response->setJSON([
-            'error' => 'Montant invalide'
-        ]);
-    }
-
-    if (strlen($telephone) < 3) {
-        return $this->response->setJSON([
-            'error' => 'Numéro invalide'
-        ]);
-    }
-
-    $prefixe = substr($telephone, 0, 3);
-
-    $prefixData = $prefixModel
-        ->where('prefixe', $prefixe)
-        ->where('actif', 1)
-        ->first();
-
-    if (!$prefixData) {
-        return $this->response->setJSON([
-            'error' => 'Préfixe invalide'
-        ]);
-    }
-
-    $autreOperateurId = !empty(
-        $prefixData['autre_operateur_id']
-    )
-        ? (int) $prefixData['autre_operateur_id']
-        : null;
-
-    $baremeQuery = $baremeFraisModel
-        ->where('type_operation_id', $typeOperationId)
-        ->where('montant_min <=', $montant)
-        ->where('montant_max >=', $montant);
-
-    if ($autreOperateurId === null) {
-        $baremeQuery->where('autre_operateur_id', null);
-    } else {
-        $baremeQuery->where(
-            'autre_operateur_id',
-            $autreOperateurId
-        );
-    }
-
-    $bareme = $baremeQuery->first();
-
-    if (!$bareme) {
-        return $this->response->setJSON([
-            'error' => 'Aucun barème trouvé'
-        ]);
-    }
-
-    $frais = (float) $bareme['frais'];
-    $commission = 0;
-
-    if ($autreOperateurId !== null) {
-        $commissionData = $commissionModel
-            ->where(
-                'autre_operateur_id',
-                $autreOperateurId
-            )
-            ->first();
-
-        if ($commissionData) {
-            $pourcentage = (float) $commissionData['pourcentage'];
-
-            $commission = round(
-                $montant * $pourcentage / 100
-            );
+        if ($montant <= 0) {
+            return $this->jsonErreur('Montant invalide');
         }
+
+        if ($typeOperationId == 1 || $typeOperationId == 2) {
+            $frais = $this->getFrais($typeOperationId, $montant);
+
+            return $this->response->setJSON([
+                'frais' => $frais,
+                'montant' => $montant,
+                'recevra' => $montant,
+                'total' => $montant + $frais,
+            ]);
+        }
+
+        $telephone = $this->nettoyerTelephone($this->request->getPost('telephone'));
+        $inclureRetrait = $this->request->getPost('inclure_frais_retrait') ? 1 : 0;
+
+        if (strlen($telephone) < 3) {
+            return $this->jsonErreur('Numéro invalide');
+        }
+
+        $prefixe = $this->getPrefixe(new PrefixModel(), $telephone, true);
+
+        if (!$prefixe) {
+            return $this->jsonErreur('Préfixe invalide');
+        }
+
+        $autreOperateurId = empty($prefixe['autre_operateur_id']) ? null : (int) $prefixe['autre_operateur_id'];
+        $couts = $this->calculerCoutsTransfert($montant, $autreOperateurId, $inclureRetrait, false);
+
+        if (isset($couts['erreur'])) {
+            return $this->jsonErreur($couts['erreur']);
+        }
+
+        return $this->response->setJSON([
+            'frais' => $couts['frais_transfert'],
+            'frais_retrait' => $couts['frais_retrait'],
+            'commission' => $couts['commission'],
+            'montant_recu' => $couts['montant_recu'],
+            'total' => $couts['total'],
+        ]);
     }
 
-    if ($priseEnChargeCommission === 1) {
-        $montantRecu = $montant;
-        $totalADebiter = $montant + $frais + $commission;
-    } else {
-        $montantRecu = $montant - $commission;
-        $totalADebiter = $montant + $frais;
-    }
-
-    return $this->response->setJSON([
-        'frais'        => $frais,
-        'commission'   => $commission,
-        'montant_recu' => $montantRecu,
-        'total'        => $totalADebiter
-    ]);
-}
     public function historique2($id)
-{
-    $transactionModel = new TransactionModel();
-    $compteModel = new CompteModel();
+    {
+        $compteModel = new CompteModel();
+        $compte = $compteModel->find($id);
 
-    $compte = $compteModel->find($id);
+        if (!$compte) {
+            return redirect()->to('/operateur/compte')->with('error', 'Compte introuvable');
+        }
 
-    if (!$compte) {
-        return redirect()->to('/operateur/compte')
-            ->with('error', 'Compte introuvable');
+        $data = [
+            'title' => 'Historique du compte',
+            'transactions' => $this->getHistoriqueAvecSens($compte),
+            'compte' => $compte,
+            'compte_id' => $compte['id'],
+        ];
+
+        return view('transaction/historique2', $data);
     }
 
-    $transactionsBrutes = $transactionModel->getHistorique($compte['id']);
-
-    // Ajouter le champ "sens" (in/out) pour chaque transaction
-    $transactions = array_map(function ($t) use ($compte) {
-        $t['sens'] = ($t['compte_destination_id'] == $compte['id']) ? 'in' : 'out';
-
-        return $t;
-    }, $transactionsBrutes);
-
-    $data = [
-        'title' => 'Historique du compte',
-        'transactions' => $transactions,
-        'compte' => $compte,
-        'compte_id' => $compte['id']
-    ];
-
-    return view('transaction/historique2', $data);
-}
-
-public function transfertMultiple()
-{
-    return view('transaction/transfert_multiple');
-}
-
-public function enregistrerTransfertMultiple()
-{
-    $compteModel = new CompteModel();
-    $prefixModel = new \App\Models\PrefixModel();
-    $baremeModel = new BaremeFraisModel();
-    $commissionModel = new \App\Models\CommissionInterOperateurModel();
-    $transactionModel = new TransactionModel();
-
-    $clientId = session()->get('client_id');
-    $montantTotal = (int) $this->request->getPost('montant_total');
-    $telephones = $this->request->getPost('telephones');
-    $inclureRetrait = $this->request->getPost('inclure_frais_retrait') ? 1 : 0;
-
-    if (!$clientId) return redirect()->to('/');
-    if ($montantTotal <= 0 || !is_array($telephones) || count($telephones) < 2) {
-        return redirect()->back()->withInput()->with('error', 'Données invalides');
+    public function transfertMultiple()
+    {
+        return view('transaction/transfert_multiple');
     }
 
-    $telephones = array_map(
-        fn($tel) => preg_replace('/\D/', '', $tel),
-        $telephones
-    );
+    public function calculerFraisTransfertMultiple()
+    {
+        $montantTotal = (int) $this->request->getPost('montant_total');
+        $telephones = $this->nettoyerListeTelephones($this->request->getPost('telephones'));
+        $inclureRetrait = $this->request->getPost('inclure_frais_retrait') ? 1 : 0;
 
-    if (
-        count(array_unique($telephones)) !== count($telephones) ||
-        array_filter($telephones, fn($tel) => strlen($tel) !== 10)
-    ) {
-        return redirect()->back()->withInput()->with('error', 'Numéros invalides ou en double');
+        $erreur = $this->validerTransfertMultiple($montantTotal, $telephones);
+
+        if ($erreur) {
+            return $this->jsonErreur($erreur, ['success' => false]);
+        }
+
+        $preparation = $this->preparerTransfertMultiple($montantTotal, $telephones, $inclureRetrait, false);
+
+        if (isset($preparation['erreur'])) {
+            return $this->jsonErreur($preparation['erreur'], ['success' => false]);
+        }
+
+        $data = [
+            'success' => true,
+            'total_frais' => $preparation['total_frais'],
+            'total_frais_retrait' => $preparation['total_frais_retrait'],
+            'total_commission' => $preparation['total_commission'],
+            'total_montant_recu' => $preparation['montant_total'],
+            'total_a_debiter' => $preparation['total'],
+            'details' => $preparation['details'],
+        ];
+
+        if (function_exists('csrf_hash')) {
+            $data['csrf_hash'] = csrf_hash();
+        }
+
+        return $this->response->setJSON($data);
     }
 
-    $source = $compteModel->getCompteByClientId($clientId);
+    public function enregistrerTransfertMultiple()
+    {
+        $clientId = session()->get('client_id');
+        $montantTotal = (int) $this->request->getPost('montant_total');
+        $telephones = $this->nettoyerListeTelephones($this->request->getPost('telephones'));
+        $inclureRetrait = $this->request->getPost('inclure_frais_retrait') ? 1 : 0;
 
-    if (!$source) {
-        return redirect()->back()->with('error', 'Compte source introuvable');
+        if (!$clientId) {
+            return redirect()->to('/');
+        }
+
+        $erreur = $this->validerTransfertMultiple($montantTotal, $telephones);
+
+        if ($erreur) {
+            return $this->retourErreur($erreur);
+        }
+
+        $compteModel = new CompteModel();
+        $transactionModel = new TransactionModel();
+        $source = $compteModel->getCompteByClientId($clientId);
+
+        if (!$source) {
+            return redirect()->back()->with('error', 'Compte source introuvable');
+        }
+
+        $preparation = $this->preparerTransfertMultiple($montantTotal, $telephones, $inclureRetrait, true, $compteModel, $source);
+
+        if (isset($preparation['erreur'])) {
+            return $this->retourErreur($preparation['erreur']);
+        }
+
+        if ($source['solde'] < $preparation['total']) {
+            return $this->retourErreur('Solde insuffisant');
+        }
+
+        $db = db_connect();
+        $db->transStart();
+
+        foreach ($preparation['details'] as $detail) {
+            $fraisTotal = $detail['frais'] + $detail['frais_retrait'];
+            $transactionModel->enregistrerTransfertMultiple($source['id'], $detail['destination']['id'], 3, $detail['montant'], $detail['montant_recu'], $fraisTotal, $detail['commission'], 1, $detail['autre_operateur_id']);
+            $this->crediterCompte($compteModel, $detail['destination'], $detail['montant_recu']);
+        }
+
+        $this->debiterCompte($compteModel, $source, $preparation['total']);
+        $db->transComplete();
+
+        if (!$db->transStatus()) {
+            return $this->retourErreur('Erreur pendant le transfert');
+        }
+
+        return redirect()->to('/accueil')->with('success', 'Transfert effectué vers ' . count($telephones) . ' destinataires');
     }
 
-    $nombre = count($telephones);
-    $montantBase = intdiv($montantTotal, $nombre);
-    $reste = $montantTotal % $nombre;
+    private function nettoyerTelephone($telephone)
+    {
+        return preg_replace('/\D/', '', (string) $telephone);
+    }
 
-    $details = [];
-    $operateurCommun = null;
-    $totalFrais = 0;
-    $totalRetrait = 0;
-    $totalCommission = 0;
+    private function nettoyerListeTelephones($telephones)
+    {
+        if (!is_array($telephones)) {
+            return [];
+        }
 
-    foreach ($telephones as $index => $telephone) {
-        $montant = $montantBase + ($index === 0 ? $reste : 0);
-        $prefixe = $prefixModel->findByPrefixe(substr($telephone, 0, 3));
+        $liste = [];
+        foreach ($telephones as $telephone) {
+            $liste[] = $this->nettoyerTelephone($telephone);
+        }
+
+        return $liste;
+    }
+
+    private function validerTransfertMultiple($montantTotal, $telephones)
+    {
+        if ($montantTotal <= 0 || count($telephones) < 2) {
+            return 'Données invalides';
+        }
+
+        if (count(array_unique($telephones)) !== count($telephones)) {
+            return 'Numéros invalides ou en double';
+        }
+
+        foreach ($telephones as $telephone) {
+            if (strlen($telephone) !== 10) {
+                return 'Numéros invalides ou en double';
+            }
+        }
+
+        return null;
+    }
+
+    private function getDestinataire($compteModel, $prefixModel, $telephone, $source)
+    {
         $destination = $compteModel->getCompteByTelephone($telephone);
+        $prefixe = $this->getPrefixe($prefixModel, $telephone);
 
-        if (!$prefixe || !$destination || $destination['id'] == $source['id']) {
-            return redirect()->back()->withInput()->with('error', "Destinataire invalide : $telephone");
+        if (!$source || !$destination || !$prefixe || $source['id'] == $destination['id']) {
+            return ['erreur' => 'Destinataire invalide'];
         }
 
-        $autreOperateurId = empty($prefixe['autre_operateur_id'])
-            ? null
-            : (int) $prefixe['autre_operateur_id'];
+        $autreOperateurId = empty($prefixe['autre_operateur_id']) ? null : (int) $prefixe['autre_operateur_id'];
 
-        if ($index === 0) {
-            $operateurCommun = $autreOperateurId;
-        } elseif ($autreOperateurId !== $operateurCommun) {
-            return redirect()->back()->withInput()
-                ->with('error', 'Tous les numéros doivent être du même opérateur');
-        }
-
-        $baremeTransfert = $baremeModel->getFraisByMontant(
-            3,
-            $montant,
-            $autreOperateurId
-        );
-
-        if (!$baremeTransfert) {
-            return redirect()->back()->withInput()
-                ->with('error', 'Barème de transfert introuvable');
-        }
-
-        $frais = (float) $baremeTransfert['frais'];
-        $fraisRetrait = 0;
-
-        if ($inclureRetrait) {
-            $baremeRetrait = $baremeModel->getFraisByMontant(
-                2,
-                $montant,
-                $autreOperateurId
-            );
-
-            if (!$baremeRetrait) {
-                return redirect()->back()->withInput()
-                    ->with('error', 'Barème de retrait introuvable');
-            }
-
-            $fraisRetrait = (float) $baremeRetrait['frais'];
-        }
-
-        $commission = 0;
-
-        if ($autreOperateurId !== null) {
-            $commissionData = $commissionModel
-                ->where('autre_operateur_id', $autreOperateurId)
-                ->first();
-
-            if (!$commissionData) {
-                return redirect()->back()->withInput()
-                    ->with('error', 'Commission introuvable');
-            }
-
-            $commission = round(
-                $montant * (float) $commissionData['pourcentage'] / 100
-            );
-        }
-
-        $totalFrais += $frais;
-        $totalRetrait += $fraisRetrait;
-        $totalCommission += $commission;
-
-        $details[] = [
-            'destination' => $destination,
-            'montant' => $montant,
-            'frais' => $frais,
-            'frais_retrait' => $fraisRetrait,
-            'commission' => $commission,
-            'autre_operateur_id' => $autreOperateurId
+        return [
+            'compte' => $destination,
+            'autre_operateur_id' => $autreOperateurId,
         ];
     }
 
-    $totalADebiter =
-        $montantTotal +
-        $totalFrais +
-        $totalRetrait +
-        $totalCommission;
+    private function getPrefixe($prefixModel, $telephone, $actifSeulement = false)
+    {
+        $query = $prefixModel->where('prefixe', substr($telephone, 0, 3));
 
-    if ($source['solde'] < $totalADebiter) {
-        return redirect()->back()->withInput()
-            ->with('error', 'Solde insuffisant');
+        if ($actifSeulement) {
+            $query->where('actif', 1);
+        }
+
+        return $query->first();
     }
 
-    $db = db_connect();
-    $db->transStart();
+    private function getFrais($typeOperationId, $montant, $autreOperateurId = null)
+    {
+        $baremeModel = new BaremeFraisModel();
+        $bareme = $baremeModel->getFraisByMontant($typeOperationId, $montant, $autreOperateurId);
 
-    foreach ($details as $detail) {
-        $transactionModel->enregistrerTransfertMultiple(
-            $source['id'],
-            $detail['destination']['id'],
-            3,
-            $detail['montant'],
-            $detail['montant'],
-            $detail['frais'],
-            $detail['frais_retrait'],
-            $detail['commission'],
-            $inclureRetrait,
-            $detail['autre_operateur_id']
-        );
+        if (!$bareme) {
+            return 0;
+        }
 
-        $compteModel->update($detail['destination']['id'], [
-            'solde' => $detail['destination']['solde'] + $detail['montant']
-        ]);
+        return (float) $bareme['frais'];
     }
 
-    $compteModel->update($source['id'], [
-        'solde' => $source['solde'] - $totalADebiter
-    ]);
+    private function calculerCoutsTransfert($montant, $autreOperateurId, $inclureRetrait, $commissionObligatoire)
+    {
+        $baremeModel = new BaremeFraisModel();
+        $commissionModel = new CommissionInterOperateurModel();
+        $baremeTransfert = $baremeModel->getFraisByMontant(3, $montant, $autreOperateurId);
 
-    $db->transComplete();
+        if (!$baremeTransfert) {
+            return ['erreur' => 'Barème de transfert introuvable'];
+        }
 
-    if (!$db->transStatus()) {
-        return redirect()->back()->withInput()
-            ->with('error', 'Erreur pendant le transfert');
+        $fraisTransfert = (float) $baremeTransfert['frais'];
+        $fraisRetrait = $this->getFraisRetraitSiPossible($montant, $autreOperateurId, $inclureRetrait);
+        $commission = $this->getCommission($commissionModel, $montant, $autreOperateurId, $commissionObligatoire);
+
+        if (isset($fraisRetrait['erreur'])) {
+            return $fraisRetrait;
+        }
+
+        if (isset($commission['erreur'])) {
+            return $commission;
+        }
+
+        return [
+            'frais_transfert' => $fraisTransfert,
+            'frais_retrait' => $fraisRetrait,
+            'frais_total' => $fraisTransfert + $fraisRetrait,
+            'commission' => $commission,
+            'montant_recu' => $montant,
+            'total' => $montant + $fraisTransfert + $fraisRetrait + $commission,
+        ];
     }
 
-    return redirect()->to('/accueil')->with(
-        'success',
-        "Transfert effectué vers $nombre destinataires"
-    );
-}
-public function getHistorique($compte_id)
-{
-    $transactionModel = new TransactionModel();
+    private function getFraisRetraitSiPossible($montant, $autreOperateurId, $inclureRetrait)
+    {
+        if (!$inclureRetrait || $autreOperateurId !== null) {
+            return 0;
+        }
 
-    $data = [
-        'title' => 'Historique du compte',
-        'historique' => $transactionModel->getHistorique($compte_id),
-        'compte_id' => $compte_id
-    ];
+        $baremeModel = new BaremeFraisModel();
+        $baremeRetrait = $baremeModel->getFraisByMontant(2, $montant, null);
 
-    return view('transaction/index', $data);
-}
+        if (!$baremeRetrait) {
+            return ['erreur' => 'Barème de retrait introuvable'];
+        }
+
+        return (float) $baremeRetrait['frais'];
+    }
+
+    private function getCommission($commissionModel, $montant, $autreOperateurId, $obligatoire)
+    {
+        if ($autreOperateurId === null) {
+            return 0;
+        }
+
+        $commissionData = $commissionModel->where('autre_operateur_id', $autreOperateurId)->first();
+
+        if (!$commissionData) {
+            if ($obligatoire) {
+                return ['erreur' => 'Commission introuvable'];
+            }
+
+            return 0;
+        }
+
+        return round($montant * (float) $commissionData['pourcentage'] / 100);
+    }
+
+    private function preparerTransfertMultiple($montantTotal, $telephones, $inclureRetrait, $verifierCompte, $compteModel = null, $source = null)
+    {
+        $details = [];
+        $operateurCommun = null;
+        $totalFrais = 0;
+        $totalFraisRetrait = 0;
+        $totalCommission = 0;
+        $nombre = count($telephones);
+        $prefixModel = new PrefixModel();
+
+        foreach ($telephones as $index => $telephone) {
+            $montant = $this->getMontantPourDestinataire($montantTotal, $nombre, $index);
+            $prefixe = $this->getPrefixe($prefixModel, $telephone, true);
+
+            if (!$prefixe) {
+                return ['erreur' => 'Préfixe invalide : ' . $telephone];
+            }
+
+            $autreOperateurId = empty($prefixe['autre_operateur_id']) ? null : (int) $prefixe['autre_operateur_id'];
+            $destination = null;
+
+            if ($verifierCompte) {
+                $destination = $compteModel->getCompteByTelephone($telephone);
+
+                if (!$destination || $destination['id'] == $source['id']) {
+                    return ['erreur' => 'Destinataire invalide : ' . $telephone];
+                }
+            }
+
+            if ($index == 0) {
+                $operateurCommun = $autreOperateurId;
+            } elseif ($autreOperateurId !== $operateurCommun) {
+                return ['erreur' => 'Tous les numéros doivent être du même opérateur'];
+            }
+
+            $couts = $this->calculerCoutsTransfert($montant, $autreOperateurId, $inclureRetrait, true);
+
+            if (isset($couts['erreur'])) {
+                return $couts;
+            }
+
+            $totalFrais += $couts['frais_transfert'];
+            $totalFraisRetrait += $couts['frais_retrait'];
+            $totalCommission += $couts['commission'];
+
+            $details[] = [
+                'telephone' => $telephone,
+                'destination' => $destination,
+                'montant' => $montant,
+                'montant_recu' => $couts['montant_recu'],
+                'frais' => $couts['frais_transfert'],
+                'frais_retrait' => $couts['frais_retrait'],
+                'commission' => $couts['commission'],
+                'autre_operateur_id' => $autreOperateurId,
+            ];
+        }
+
+        return [
+            'details' => $details,
+            'montant_total' => $montantTotal,
+            'total_frais' => $totalFrais,
+            'total_frais_retrait' => $totalFraisRetrait,
+            'total_commission' => $totalCommission,
+            'total' => $montantTotal + $totalFrais + $totalFraisRetrait + $totalCommission,
+        ];
+    }
+
+    private function getMontantPourDestinataire($montantTotal, $nombre, $index)
+    {
+        $montantBase = intdiv($montantTotal, $nombre);
+        $reste = $montantTotal % $nombre;
+
+        if ($index == 0) {
+            return $montantBase + $reste;
+        }
+
+        return $montantBase;
+    }
+
+    private function crediterCompte($compteModel, $compte, $montant)
+    {
+        return $compteModel->update($compte['id'], ['solde' => $compte['solde'] + $montant]);
+    }
+
+    private function debiterCompte($compteModel, $compte, $montant)
+    {
+        return $compteModel->update($compte['id'], ['solde' => $compte['solde'] - $montant]);
+    }
+
+    private function getHistoriqueAvecSens($compte)
+    {
+        $transactionModel = new TransactionModel();
+        $transactions = $transactionModel->getHistorique($compte['id']);
+
+        foreach ($transactions as $key => $transaction) {
+            if ($transaction['compte_destination_id'] == $compte['id']) {
+                $transactions[$key]['sens'] = 'in';
+            } else {
+                $transactions[$key]['sens'] = 'out';
+            }
+        }
+
+        return $transactions;
+    }
+
+    private function retourErreur($message)
+    {
+        return redirect()->back()->withInput()->with('error', $message);
+    }
+
+    private function jsonErreur($message, $extra = [])
+    {
+        $data = array_merge($extra, ['error' => $message]);
+
+        if (function_exists('csrf_hash')) {
+            $data['csrf_hash'] = csrf_hash();
+        }
+
+        return $this->response->setJSON($data);
+    }
 }

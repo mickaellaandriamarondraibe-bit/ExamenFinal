@@ -50,8 +50,14 @@ class OperateurController extends BaseController
 
     public function logout()
     {
+        $estOperateur = session()->get('role') === 'operateur';
+
         session()->destroy();
 
-        return redirect()->to('/operateur/login');
+        if ($estOperateur) {
+            return redirect()->to('/operateur/login');
+        }
+
+        return redirect()->to('/');
     }
 }
