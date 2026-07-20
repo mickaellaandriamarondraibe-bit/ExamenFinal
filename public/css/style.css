@@ -1,0 +1,284 @@
+:root {
+  --green-dark: #123D2E;
+  --green: #1B6B4A;
+  --green-light: #E6F3EC;
+  --cream: #F6F5F1;
+  --white: #FFFFFF;
+  --text: #1A2420;
+  --text-muted: #6B7A73;
+  --red: #D64545;
+  --border: #E3E1DA;
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 30px rgba(18, 61, 46, 0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 24px 12px;
+}
+
+h1, h2, h3, .brand { font-family: 'Poppins', sans-serif; }
+
+/* ===== Cadre "téléphone" ===== */
+.phone {
+  width: 100%;
+  max-width: 400px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 720px;
+}
+
+/* ===== Header vert ===== */
+.app-header {
+  background: var(--green-dark);
+  color: var(--white);
+  padding: 20px 20px 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.app-header.simple { padding-bottom: 20px; }
+
+.app-header .back-btn {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.12);
+  border-radius: 50%;
+  text-decoration: none;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.app-header h1 {
+  font-size: 17px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.app-header .bell {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.12);
+  border-radius: 50%;
+}
+
+.greeting { font-size: 13px; opacity: 0.85; margin-bottom: 2px; }
+.greeting strong { display: block; font-size: 18px; font-weight: 600; margin-top: 2px; }
+
+/* ===== Contenu scrollable ===== */
+.app-content {
+  flex: 1;
+  padding: 20px;
+  padding-bottom: 90px;
+  overflow-y: auto;
+}
+
+/* ===== Cartes ===== */
+.card {
+  background: var(--green-light);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.card-white {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.solde-label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+.solde-montant { font-size: 30px; font-weight: 700; color: var(--green-dark); display: flex; align-items: center; gap: 10px; }
+.solde-maj { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+
+/* ===== Actions rapides ===== */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.quick-actions a {
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.quick-actions .icon-circle {
+  width: 48px; height: 48px;
+  background: var(--green-light);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--green-dark);
+}
+
+/* ===== Formulaires ===== */
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.field .input-wrap { position: relative; }
+.field input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--white);
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(27,107,74,0.12);
+}
+.field .suffix {
+  position: absolute;
+  right: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--green-dark);
+  color: var(--white);
+  border: none;
+  padding: 15px;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-primary:hover { background: var(--green); }
+
+.btn-secondary {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 13px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+/* ===== Détail frais ===== */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 6px 0;
+  color: var(--text-muted);
+}
+.detail-row.total {
+  color: var(--text);
+  font-weight: 700;
+  border-top: 1px dashed var(--border);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+.detail-row.total .val { color: var(--red); }
+
+/* ===== Alertes ===== */
+.alert {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.alert-error { background: #FCE9E9; color: var(--red); }
+.alert-success { background: var(--green-light); color: var(--green-dark); }
+
+/* ===== Bottom nav ===== */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 8px 14px;
+}
+.bottom-nav a {
+  text-decoration: none;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+.bottom-nav a.active { color: var(--green-dark); font-weight: 600; }
+
+/* ===== Login ===== */
+.login-wrap { text-align: center; padding: 40px 24px; }
+.logo-circle {
+  width: 88px; height: 88px;
+  background: var(--green-dark);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+  color: var(--white);
+}
+.brand { font-size: 22px; font-weight: 700; color: var(--green-dark); }
+.tagline { font-size: 13px; color: var(--text-muted); margin-bottom: 36px; }
+.login-wrap .field { text-align: left; }
+.legal { font-size: 11px; color: var(--text-muted); margin-top: 18px; line-height: 1.5; }
+
+/* ===== Historique ===== */
+.hist-group-label { font-size: 13px; color: var(--text-muted); margin: 18px 0 8px; }
+.hist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.hist-item .icon-circle {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hist-item .icon-circle.in { background: var(--green-light); color: var(--green-dark); }
+.hist-item .icon-circle.out { background: #FCE9E9; color: var(--red); }
+.hist-item .info { flex: 1; }
+.hist-item .info .type { font-size: 14px; font-weight: 500; }
+.hist-item .info .ref { font-size: 12px; color: var(--text-muted); }
+.hist-item .amount { text-align: right; }
+.hist-item .amount .val { font-size: 14px; font-weight: 600; }
+.hist-item .amount .val.in { color: var(--green-dark); }
+.hist-item .amount .val.out { color: var(--red); }
+.hist-item .amount .time { font-size: 11px; color: var(--text-muted); }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }

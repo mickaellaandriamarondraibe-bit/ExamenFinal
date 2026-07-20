@@ -120,3 +120,6 @@
 ``` 
     app/Database/Seeds/UserSeeder.php
 ```
+
+
+sqlite3 writable/mobile_money.sqlit
