@@ -15,9 +15,14 @@ class PrefixController extends BaseController
 
     public function index()
     {
+        $prefixes = $this->prefixModel
+            ->select('prefixes.*, autre_operateur.nom AS nom_autre_operateur')
+            ->join('autre_operateur', 'autre_operateur.id = prefixes.autre_operateur_id', 'left')
+            ->findAll();
+
         $data = [
             'title' => 'Préfixes',
-            'prefixes' => $this->prefixModel->findAll()
+            'prefixes' => $prefixes
         ];
 
         return view('prefixes/index', $data);
@@ -26,7 +31,8 @@ class PrefixController extends BaseController
     public function create()
     {
         return view('prefixes/create', [
-            'title' => 'Nouveau préfixe'
+            'title' => 'Nouveau préfixe',
+            'autresOperateurs' => $this->getAutresOperateurs()
         ]);
     }
 
@@ -34,6 +40,7 @@ class PrefixController extends BaseController
     {
         $this->prefixModel->insert([
             'prefixe' => $this->request->getPost('prefixe'),
+            'autre_operateur_id' => $this->getAutreOperateurId(),
             'actif'   => $this->request->getPost('actif')
         ]);
 
@@ -44,7 +51,8 @@ class PrefixController extends BaseController
     {
         $data = [
             'title' => 'Modifier un préfixe',
-            'prefix' => $this->prefixModel->find($id)
+            'prefix' => $this->prefixModel->find($id),
+            'autresOperateurs' => $this->getAutresOperateurs()
         ];
 
         return view('prefixes/edit', $data);
@@ -54,6 +62,7 @@ class PrefixController extends BaseController
     {
         $this->prefixModel->update($id, [
             'prefixe' => $this->request->getPost('prefixe'),
+            'autre_operateur_id' => $this->getAutreOperateurId(),
             'actif'   => $this->request->getPost('actif')
         ]);
 
@@ -70,5 +79,21 @@ class PrefixController extends BaseController
     public function findBylibelle($libelle)
     {
         return $this->prefixModel->findBylibelle($libelle);
+    }
+
+    private function getAutresOperateurs()
+    {
+        return db_connect()->table('autre_operateur')->orderBy('nom', 'ASC')->get()->getResultArray();
+    }
+
+    private function getAutreOperateurId()
+    {
+        $autreOperateurId = $this->request->getPost('autre_operateur_id');
+
+        if ($autreOperateurId == '') {
+            return null;
+        }
+
+        return $autreOperateurId;
     }
 }
