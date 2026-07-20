@@ -1,277 +1,611 @@
-<?= $this->extend('layouts/client') ?>
+<!DOCTYPE html>
+<html lang="fr">
 
-<?= $this->section('content') ?>
+<head>
+    <meta charset="UTF-8">
 
-<div class="transfer-page">
-
-    <div class="page-header">
-        <div>
-            <h1>Transfert multiple</h1>
-            <p>
-                Envoyez un montant total à plusieurs destinataires
-                appartenant au même opérateur.
-            </p>
-        </div>
-
-        <a
-            href="<?= site_url('client/transfert') ?>"
-            class="btn btn-outline"
-        >
-            Transfert simple
-        </a>
-    </div>
-
-    <?php if (session()->getFlashdata('error')): ?>
-        <div class="alert alert-error">
-            <?= esc(session()->getFlashdata('error')) ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if (session()->getFlashdata('success')): ?>
-        <div class="alert alert-success">
-            <?= esc(session()->getFlashdata('success')) ?>
-        </div>
-    <?php endif; ?>
-
-    <form
-        action="<?= site_url('client/transfert-multiple') ?>"
-        method="post"
-        id="form-transfert-multiple"
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
     >
-        <?= csrf_field() ?>
 
-        <div class="transfer-layout">
+    <title>Transfert multiple</title>
 
-            <!-- Formulaire principal -->
-            <div class="card transfer-form-card">
+    <link
+        rel="stylesheet"
+        href="<?= base_url('css/style.css') ?>"
+    >
 
-                <div class="form-section">
-                    <div class="section-header">
-                        <div class="section-number">1</div>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-                        <div>
-                            <h2>Montant à répartir</h2>
-                            <p>
-                                Le montant sera partagé entre tous les
-                                destinataires.
-                            </p>
-                        </div>
-                    </div>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f7f6f2;
+            color: #1f2937;
+            font-family: Arial, sans-serif;
+        }
 
-                    <div class="form-group">
-                        <label for="montant_total">
-                            Montant total
-                        </label>
+        .mobile-container {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            margin: 0 auto;
+            padding-bottom: 90px;
+            background: #ffffff;
+            border-left: 1px solid #eeeeee;
+            border-right: 1px solid #eeeeee;
+        }
 
-                        <div class="input-with-suffix">
-                            <input
-                                type="number"
-                                name="montant_total"
-                                id="montant_total"
-                                min="1"
-                                step="1"
-                                placeholder="Exemple : 30 000"
-                                value="<?= old('montant_total') ?>"
-                                required
-                            >
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            background: #00543f;
+            color: #ffffff;
+        }
 
-                            <span>Ar</span>
-                        </div>
+        .back-button {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            font-size: 22px;
+            text-decoration: none;
+        }
 
-                        <small class="field-error" id="erreur-montant"></small>
-                    </div>
+        .page-header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .page-content {
+            padding: 20px;
+        }
+
+        .alert {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .alert-error {
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .alert-success {
+            border: 1px solid #bbf7d0;
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 7px;
+            color: #55756b;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 50px;
+            padding: 0 14px;
+            border: 1px solid #dedbd5;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #1f2937;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #00543f;
+            box-shadow: 0 0 0 3px rgba(0, 84, 63, 0.10);
+        }
+
+        .input-montant {
+            padding-right: 48px;
+        }
+
+        .input-suffix {
+            position: absolute;
+            top: 50%;
+            right: 14px;
+            transform: translateY(-50%);
+            color: #55756b;
+            font-size: 13px;
+        }
+
+        .recipients-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 11px;
+        }
+
+        .recipients-header .form-label {
+            margin: 0;
+        }
+
+        .add-button {
+            padding: 8px 11px;
+            border: 1px solid #00543f;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #00543f;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .recipient-row {
+            display: grid;
+            grid-template-columns: 32px minmax(0, 1fr) 38px;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 10px;
+        }
+
+        .recipient-index {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #e5f3ee;
+            color: #00543f;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .remove-button {
+            width: 38px;
+            height: 42px;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            background: #fff5f5;
+            color: #ef4444;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .remove-button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .helper-text {
+            display: block;
+            margin-top: 4px;
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .error-text {
+            min-height: 15px;
+            margin-top: 5px;
+            color: #dc2626;
+            font-size: 12px;
+        }
+
+        .commission-option {
+            margin: 18px 0 8px;
+        }
+
+        .checkbox-line {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #55756b;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .checkbox-line input {
+            width: 17px;
+            height: 17px;
+            accent-color: #00543f;
+        }
+
+        .commission-description {
+            margin: 8px 0 0;
+            color: #1f2937;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .summary-card {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            background: #def3ec;
+        }
+
+        .summary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 12px;
+            color: #55756b;
+            font-size: 13px;
+        }
+
+        .summary-row strong {
+            color: #4b665e;
+            font-size: 13px;
+        }
+
+        .summary-divider {
+            margin: 12px 0;
+            border: 0;
+            border-top: 1px dashed rgba(0, 84, 63, 0.18);
+        }
+
+        .summary-total {
+            margin-bottom: 0;
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .summary-total strong {
+            color: #f50046;
+            font-size: 15px;
+        }
+
+        .distribution-card {
+            display: none;
+            margin-top: 12px;
+            padding: 13px;
+            border: 1px solid #d7ebe4;
+            border-radius: 10px;
+            background: #f7fcfa;
+        }
+
+        .distribution-title {
+            margin: 0 0 10px;
+            color: #00543f;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .distribution-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e6efec;
+            font-size: 12px;
+        }
+
+        .distribution-row:last-child {
+            border-bottom: 0;
+        }
+
+        .distribution-phone {
+            color: #55756b;
+        }
+
+        .distribution-amount {
+            color: #111827;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .submit-button {
+            width: 100%;
+            height: 51px;
+            margin-top: 16px;
+            border: 0;
+            border-radius: 10px;
+            background: #00543f;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background: #004333;
+        }
+
+        .simple-transfer-button {
+            width: 100%;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            border: 1px solid #dedbd5;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            z-index: 50;
+            width: 100%;
+            max-width: 430px;
+            height: 70px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            transform: translateX(-50%);
+            border-top: 1px solid #e5e7eb;
+            background: #ffffff;
+        }
+
+        .navigation-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            color: #6b827a;
+            font-size: 10px;
+            text-decoration: none;
+        }
+
+        .navigation-icon {
+            font-size: 17px;
+            line-height: 1;
+        }
+
+        .navigation-item.active {
+            color: #00543f;
+            font-weight: 700;
+        }
+
+        @media (min-width: 431px) {
+            .mobile-container {
+                box-shadow: 0 0 18px rgba(15, 23, 42, 0.05);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="mobile-container">
+
+    <header class="page-header">
+        <a
+            href="<?= site_url('transfert') ?>"
+            class="back-button"
+            aria-label="Retour"
+        >
+            ‹
+        </a>
+
+        <h1>Transfert multiple</h1>
+    </header>
+
+    <main class="page-content">
+
+        <?php if (session()->getFlashdata('error')): ?>
+            <div class="alert alert-error">
+                <?= esc(session()->getFlashdata('error')) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (session()->getFlashdata('success')): ?>
+            <div class="alert alert-success">
+                <?= esc(session()->getFlashdata('success')) ?>
+            </div>
+        <?php endif; ?>
+
+        <form
+            action="<?= site_url('transfert-multiple') ?>"
+            method="post"
+            id="form-transfert-multiple"
+        >
+            <?= csrf_field() ?>
+
+            <div class="form-group">
+                <label
+                    for="montant_total"
+                    class="form-label"
+                >
+                    Montant total à transférer
+                </label>
+
+                <div class="input-wrapper">
+                    <input
+                        type="number"
+                        name="montant_total"
+                        id="montant_total"
+                        class="form-input input-montant"
+                        min="1"
+                        step="1"
+                        placeholder="Entrez le montant total"
+                        value="<?= esc(old('montant_total')) ?>"
+                        required
+                    >
+
+                    <span class="input-suffix">Ar</span>
                 </div>
 
-                <div class="separator"></div>
+                <div
+                    class="error-text"
+                    id="erreur-montant"
+                ></div>
+            </div>
 
-                <div class="form-section">
-                    <div class="section-header section-header-action">
-                        <div class="section-header-left">
-                            <div class="section-number">2</div>
+            <div class="form-group">
 
-                            <div>
-                                <h2>Destinataires</h2>
-                                <p>
-                                    Tous les numéros doivent appartenir
-                                    au même opérateur.
-                                </p>
-                            </div>
-                        </div>
+                <div class="recipients-header">
+                    <label class="form-label">
+                        Numéros des destinataires
+                    </label>
+
+                    <button
+                        type="button"
+                        class="add-button"
+                        id="ajouter-destinataire"
+                    >
+                        + Ajouter
+                    </button>
+                </div>
+
+                <div id="liste-destinataires">
+
+                    <div class="recipient-row">
+                        <div class="recipient-index">1</div>
+
+                        <input
+                            type="tel"
+                            name="telephones[]"
+                            class="form-input telephone-input"
+                            maxlength="10"
+                            inputmode="numeric"
+                            placeholder="Ex : 032 98 765 43"
+                            required
+                        >
 
                         <button
                             type="button"
-                            class="btn btn-outline btn-small"
-                            id="ajouter-destinataire"
+                            class="remove-button"
+                            disabled
+                            aria-label="Supprimer"
                         >
-                            + Ajouter
+                            ×
                         </button>
                     </div>
 
-                    <div id="liste-destinataires">
+                    <div class="recipient-row">
+                        <div class="recipient-index">2</div>
 
-                        <div class="recipient-row">
-                            <div class="recipient-number">
-                                1
-                            </div>
-
-                            <div class="recipient-field">
-                                <label>Numéro du destinataire</label>
-
-                                <input
-                                    type="tel"
-                                    name="telephones[]"
-                                    class="telephone-input"
-                                    maxlength="10"
-                                    placeholder="032 XX XXX XX"
-                                    inputmode="numeric"
-                                    required
-                                >
-                            </div>
-
-                            <button
-                                type="button"
-                                class="btn-remove"
-                                title="Supprimer ce destinataire"
-                                disabled
-                            >
-                                ×
-                            </button>
-                        </div>
-
-                        <div class="recipient-row">
-                            <div class="recipient-number">
-                                2
-                            </div>
-
-                            <div class="recipient-field">
-                                <label>Numéro du destinataire</label>
-
-                                <input
-                                    type="tel"
-                                    name="telephones[]"
-                                    class="telephone-input"
-                                    maxlength="10"
-                                    placeholder="032 XX XXX XX"
-                                    inputmode="numeric"
-                                    required
-                                >
-                            </div>
-
-                            <button
-                                type="button"
-                                class="btn-remove"
-                                title="Supprimer ce destinataire"
-                            >
-                                ×
-                            </button>
-                        </div>
-
-                    </div>
-
-                    <small class="field-error" id="erreur-destinataires"></small>
-                </div>
-
-                <div class="separator"></div>
-
-                <div class="form-section">
-                    <div class="section-header">
-                        <div class="section-number">3</div>
-
-                        <div>
-                            <h2>Commission inter-opérateur</h2>
-                            <p>
-                                Choisissez qui supportera les commissions.
-                            </p>
-                        </div>
-                    </div>
-
-                    <label class="commission-option">
                         <input
-                            type="checkbox"
-                            name="prise_en_charge_commission"
-                            id="prise_en_charge_commission"
-                            value="1"
+                            type="tel"
+                            name="telephones[]"
+                            class="form-input telephone-input"
+                            maxlength="10"
+                            inputmode="numeric"
+                            placeholder="Ex : 032 12 345 67"
+                            required
                         >
 
-                        <span class="custom-checkbox"></span>
-
-                        <span class="commission-content">
-                            <strong>
-                                Prendre en charge les commissions
-                            </strong>
-
-                            <small>
-                                Les destinataires recevront le montant
-                                réparti en totalité.
-                            </small>
-                        </span>
-                    </label>
-
-                    <div class="commission-information">
-                        <strong>Case non cochée :</strong>
-                        les commissions seront retirées des montants reçus
-                        par les destinataires.
+                        <button
+                            type="button"
+                            class="remove-button"
+                            aria-label="Supprimer"
+                        >
+                            ×
+                        </button>
                     </div>
+
                 </div>
 
+                <small class="helper-text">
+                    Tous les destinataires doivent appartenir au même opérateur.
+                </small>
+
+                <div
+                    class="error-text"
+                    id="erreur-destinataires"
+                ></div>
             </div>
 
-            <!-- Résumé -->
-            <aside class="card summary-card">
-                <div class="summary-header">
-                    <h2>Résumé du transfert</h2>
-                    <p>Les valeurs seront calculées automatiquement.</p>
+            <div class="commission-option">
+
+                <label class="checkbox-line">
+                    <input
+                        type="checkbox"
+                        name="prise_en_charge_commission"
+                        id="prise_en_charge_commission"
+                        value="1"
+                    >
+
+                    <span>
+                        Prendre en charge les commissions
+                    </span>
+                </label>
+
+                <p class="commission-description">
+                    Si cette option n’est pas cochée, chaque commission sera
+                    retirée du montant reçu par le destinataire concerné.
+                </p>
+            </div>
+
+            <div class="summary-card">
+
+                <div class="summary-row">
+                    <span>Destinataires</span>
+
+                    <strong id="resume-nombre">
+                        2
+                    </strong>
                 </div>
 
-                <div class="summary-list">
-                    <div class="summary-row">
-                        <span>Destinataires</span>
-                        <strong id="resume-nombre">2</strong>
-                    </div>
+                <div class="summary-row">
+                    <span>Montant par destinataire</span>
 
-                    <div class="summary-row">
-                        <span>Montant total</span>
-
-                        <strong>
-                            <span id="resume-montant-total">0</span> Ar
-                        </strong>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Montant moyen par personne</span>
-
-                        <strong>
-                            <span id="resume-montant-individuel">0</span> Ar
-                        </strong>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Frais totaux</span>
-
-                        <strong>
-                            <span id="resume-frais">0</span> Ar
-                        </strong>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Commissions totales</span>
-
-                        <strong>
-                            <span id="resume-commission">0</span> Ar
-                        </strong>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Total reçu</span>
-
-                        <strong>
-                            <span id="resume-montant-recu">0</span> Ar
-                        </strong>
-                    </div>
+                    <strong>
+                        <span id="resume-montant-individuel">0</span> Ar
+                    </strong>
                 </div>
 
-                <div class="summary-total">
-                    <span>Total à débiter</span>
+                <div class="summary-row">
+                    <span>Frais totaux</span>
+
+                    <strong>
+                        <span id="resume-frais">0</span> Ar
+                    </strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Commissions totales</span>
+
+                    <strong>
+                        <span id="resume-commission">0</span> Ar
+                    </strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Total reçu par les destinataires</span>
+
+                    <strong>
+                        <span id="resume-montant-recu">0</span> Ar
+                    </strong>
+                </div>
+
+                <hr class="summary-divider">
+
+                <div class="summary-row summary-total">
+                    <span>Total débité</span>
 
                     <strong>
                         <span id="resume-total">0</span> Ar
@@ -279,492 +613,81 @@
                 </div>
 
                 <div
-                    class="distribution-details"
-                    id="distribution-details"
+                    class="distribution-card"
+                    id="distribution-card"
                 >
-                    <h3>Répartition</h3>
+                    <p class="distribution-title">
+                        Répartition
+                    </p>
 
-                    <div id="distribution-list">
-                        <p class="empty-distribution">
-                            Saisissez le montant et les numéros pour
-                            afficher la répartition.
-                        </p>
-                    </div>
+                    <div id="distribution-list"></div>
                 </div>
 
-                <button
-                    type="submit"
-                    class="btn btn-primary btn-submit"
-                    id="bouton-envoyer"
-                >
-                    Effectuer le transfert multiple
-                </button>
-            </aside>
+            </div>
 
-        </div>
-    </form>
+            <button
+                type="submit"
+                class="submit-button"
+            >
+                Confirmer le transfert multiple
+            </button>
+
+            <a
+                href="<?= site_url('transfert') ?>"
+                class="simple-transfer-button"
+            >
+                Transfert simple
+            </a>
+
+        </form>
+
+    </main>
 
 </div>
 
-<style>
-    .transfer-page {
-        max-width: 1180px;
-        margin: 0 auto;
-        padding: 28px 20px;
-        color: #1f2937;
-    }
-
-    .page-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 24px;
-        margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-        margin: 0 0 8px;
-        font-size: 28px;
-        font-weight: 700;
-    }
-
-    .page-header p {
-        margin: 0;
-        color: #6b7280;
-        line-height: 1.5;
-    }
-
-    .transfer-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 380px;
-        gap: 24px;
-        align-items: start;
-    }
-
-    .card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
-    }
-
-    .transfer-form-card {
-        padding: 26px;
-    }
-
-    .form-section {
-        display: flex;
-        flex-direction: column;
-        gap: 22px;
-    }
-
-    .section-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 14px;
-    }
-
-    .section-header-action {
-        justify-content: space-between;
-    }
-
-    .section-header-left {
-        display: flex;
-        align-items: flex-start;
-        gap: 14px;
-    }
-
-    .section-number {
-        width: 34px;
-        height: 34px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: #eef2ff;
-        color: #4f46e5;
-        font-weight: 700;
-    }
-
-    .section-header h2 {
-        margin: 0 0 5px;
-        font-size: 18px;
-    }
-
-    .section-header p {
-        margin: 0;
-        color: #6b7280;
-        font-size: 14px;
-    }
-
-    .separator {
-        height: 1px;
-        background: #e5e7eb;
-        margin: 28px 0;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .form-group label,
-    .recipient-field label {
-        color: #374151;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    input[type="number"],
-    input[type="tel"] {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 13px 14px;
-        border: 1px solid #d1d5db;
-        border-radius: 9px;
-        background: #ffffff;
-        color: #111827;
-        font-size: 15px;
-        outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    input[type="number"]:focus,
-    input[type="tel"]:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-    }
-
-    .input-with-suffix {
-        position: relative;
-    }
-
-    .input-with-suffix input {
-        padding-right: 55px;
-    }
-
-    .input-with-suffix > span {
-        position: absolute;
-        top: 50%;
-        right: 16px;
-        transform: translateY(-50%);
-        color: #6b7280;
-        font-weight: 600;
-    }
-
-    .recipient-row {
-        display: grid;
-        grid-template-columns: 36px minmax(0, 1fr) 38px;
-        gap: 12px;
-        align-items: end;
-        padding: 14px;
-        margin-bottom: 12px;
-        border: 1px solid #e5e7eb;
-        border-radius: 11px;
-        background: #f9fafb;
-    }
-
-    .recipient-number {
-        width: 32px;
-        height: 32px;
-        margin-bottom: 7px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        font-weight: 700;
-        color: #4b5563;
-    }
-
-    .recipient-field {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-    }
-
-    .btn-remove {
-        width: 38px;
-        height: 42px;
-        border: 1px solid #fecaca;
-        border-radius: 9px;
-        background: #fff1f2;
-        color: #dc2626;
-        font-size: 24px;
-        cursor: pointer;
-    }
-
-    .btn-remove:hover:not(:disabled) {
-        background: #fee2e2;
-    }
-
-    .btn-remove:disabled {
-        cursor: not-allowed;
-        opacity: 0.4;
-    }
-
-    .commission-option {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 16px;
-        border: 1px solid #dbeafe;
-        border-radius: 11px;
-        background: #f8fbff;
-        cursor: pointer;
-    }
-
-    .commission-option input {
-        display: none;
-    }
-
-    .custom-checkbox {
-        width: 20px;
-        height: 20px;
-        flex-shrink: 0;
-        margin-top: 1px;
-        border: 2px solid #9ca3af;
-        border-radius: 5px;
-        background: #ffffff;
-        position: relative;
-    }
-
-    .commission-option input:checked + .custom-checkbox {
-        background: #4f46e5;
-        border-color: #4f46e5;
-    }
-
-    .commission-option input:checked + .custom-checkbox::after {
-        content: "";
-        position: absolute;
-        left: 5px;
-        top: 1px;
-        width: 5px;
-        height: 10px;
-        border: solid #ffffff;
-        border-width: 0 2px 2px 0;
-        transform: rotate(45deg);
-    }
-
-    .commission-content {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .commission-content small {
-        color: #6b7280;
-        line-height: 1.4;
-    }
-
-    .commission-information {
-        padding: 12px 14px;
-        border-radius: 9px;
-        background: #fffbeb;
-        color: #92400e;
-        font-size: 13px;
-        line-height: 1.5;
-    }
-
-    .summary-card {
-        position: sticky;
-        top: 20px;
-        padding: 22px;
-    }
-
-    .summary-header {
-        margin-bottom: 20px;
-    }
-
-    .summary-header h2 {
-        margin: 0 0 6px;
-        font-size: 19px;
-    }
-
-    .summary-header p {
-        margin: 0;
-        color: #6b7280;
-        font-size: 13px;
-    }
-
-    .summary-list {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    .summary-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        font-size: 14px;
-    }
-
-    .summary-row span {
-        color: #6b7280;
-    }
-
-    .summary-row strong {
-        text-align: right;
-        color: #111827;
-    }
-
-    .summary-total {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        margin-top: 20px;
-        padding: 17px 0;
-        border-top: 1px solid #e5e7eb;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .summary-total span {
-        font-weight: 600;
-    }
-
-    .summary-total strong {
-        color: #4f46e5;
-        font-size: 22px;
-    }
-
-    .distribution-details {
-        margin-top: 20px;
-    }
-
-    .distribution-details h3 {
-        margin: 0 0 12px;
-        font-size: 15px;
-    }
-
-    .distribution-item {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        padding: 10px 0;
-        border-bottom: 1px dashed #e5e7eb;
-        font-size: 13px;
-    }
-
-    .distribution-item:last-child {
-        border-bottom: 0;
-    }
-
-    .distribution-phone {
-        color: #4b5563;
-    }
-
-    .distribution-amount {
-        font-weight: 700;
-    }
-
-    .empty-distribution {
-        margin: 0;
-        color: #9ca3af;
-        font-size: 13px;
-        line-height: 1.5;
-    }
-
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 11px 16px;
-        border-radius: 9px;
-        font-size: 14px;
-        font-weight: 600;
-        text-decoration: none;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .btn-primary {
-        border: 1px solid #4f46e5;
-        background: #4f46e5;
-        color: #ffffff;
-    }
-
-    .btn-primary:hover {
-        background: #4338ca;
-    }
-
-    .btn-outline {
-        border: 1px solid #d1d5db;
-        background: #ffffff;
-        color: #374151;
-    }
-
-    .btn-outline:hover {
-        background: #f9fafb;
-    }
-
-    .btn-small {
-        padding: 8px 12px;
-        font-size: 13px;
-    }
-
-    .btn-submit {
-        width: 100%;
-        margin-top: 22px;
-        padding: 13px;
-    }
-
-    .alert {
-        margin-bottom: 18px;
-        padding: 13px 16px;
-        border-radius: 9px;
-        font-size: 14px;
-    }
-
-    .alert-error {
-        border: 1px solid #fecaca;
-        background: #fef2f2;
-        color: #991b1b;
-    }
-
-    .alert-success {
-        border: 1px solid #bbf7d0;
-        background: #f0fdf4;
-        color: #166534;
-    }
-
-    .field-error {
-        min-height: 17px;
-        color: #dc2626;
-        font-size: 12px;
-    }
-
-    @media (max-width: 900px) {
-        .transfer-layout {
-            grid-template-columns: 1fr;
-        }
-
-        .summary-card {
-            position: static;
-        }
-    }
-
-    @media (max-width: 600px) {
-        .page-header {
-            flex-direction: column;
-        }
-
-        .section-header-action {
-            flex-direction: column;
-        }
-
-        .recipient-row {
-            grid-template-columns: 32px minmax(0, 1fr) 38px;
-            padding: 10px;
-        }
-    }
-</style>
+<nav class="bottom-navigation">
+
+    <a
+        href="<?= site_url('accueil') ?>"
+        class="navigation-item"
+    >
+        <span class="navigation-icon">⌂</span>
+        <span>Accueil</span>
+    </a>
+
+    <a
+        href="<?= site_url('depot') ?>"
+        class="navigation-item"
+    >
+        <span class="navigation-icon">↓</span>
+        <span>Dépôt</span>
+    </a>
+
+    <a
+        href="<?= site_url('retrait') ?>"
+        class="navigation-item"
+    >
+        <span class="navigation-icon">↑</span>
+        <span>Retrait</span>
+    </a>
+
+    <a
+        href="<?= site_url('transfert') ?>"
+        class="navigation-item active"
+    >
+        <span class="navigation-icon">⇄</span>
+        <span>Transfert</span>
+    </a>
+
+    <a
+        href="#"
+        class="navigation-item"
+    >
+        <span class="navigation-icon">•••</span>
+        <span>Plus</span>
+    </a>
+
+</nav>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -780,14 +703,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const priseEnChargeInput =
         document.getElementById('prise_en_charge_commission');
 
-    const form =
+    const formulaire =
         document.getElementById('form-transfert-multiple');
 
-    const csrfName =
-        '<?= csrf_token() ?>';
+    const csrfName = '<?= csrf_token() ?>';
+    let csrfHash = '<?= csrf_hash() ?>';
 
-    let csrfHash =
-        '<?= csrf_hash() ?>';
+    let minuteurCalcul = null;
 
     function formaterMontant(montant) {
         return new Intl.NumberFormat('fr-FR').format(
@@ -803,50 +725,44 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function mettreAJourNumeros() {
+    function mettreAJourNumerotation() {
         const lignes =
             listeDestinataires.querySelectorAll('.recipient-row');
 
         lignes.forEach(function (ligne, index) {
-            ligne.querySelector('.recipient-number').textContent =
+            ligne.querySelector('.recipient-index').textContent =
                 index + 1;
 
-            const boutonSupprimer =
-                ligne.querySelector('.btn-remove');
-
-            boutonSupprimer.disabled = lignes.length <= 2;
+            ligne.querySelector('.remove-button').disabled =
+                lignes.length <= 2;
         });
 
         document.getElementById('resume-nombre').textContent =
             lignes.length;
     }
 
-    function creerDestinataire() {
+    function ajouterDestinataire() {
         const ligne = document.createElement('div');
 
         ligne.className = 'recipient-row';
 
         ligne.innerHTML = `
-            <div class="recipient-number"></div>
+            <div class="recipient-index"></div>
 
-            <div class="recipient-field">
-                <label>Numéro du destinataire</label>
-
-                <input
-                    type="tel"
-                    name="telephones[]"
-                    class="telephone-input"
-                    maxlength="10"
-                    placeholder="032 XX XXX XX"
-                    inputmode="numeric"
-                    required
-                >
-            </div>
+            <input
+                type="tel"
+                name="telephones[]"
+                class="form-input telephone-input"
+                maxlength="10"
+                inputmode="numeric"
+                placeholder="Ex : 032 98 765 43"
+                required
+            >
 
             <button
                 type="button"
-                class="btn-remove"
-                title="Supprimer ce destinataire"
+                class="remove-button"
+                aria-label="Supprimer"
             >
                 ×
             </button>
@@ -854,55 +770,85 @@ document.addEventListener('DOMContentLoaded', function () {
 
         listeDestinataires.appendChild(ligne);
 
-        mettreAJourNumeros();
+        mettreAJourNumerotation();
 
         ligne.querySelector('.telephone-input').focus();
     }
 
-    function afficherRepartition(montants, telephones) {
-        const conteneur =
+    function reinitialiserResultats() {
+        document.getElementById(
+            'resume-frais'
+        ).textContent = '0';
+
+        document.getElementById(
+            'resume-commission'
+        ).textContent = '0';
+
+        document.getElementById(
+            'resume-montant-recu'
+        ).textContent = '0';
+
+        document.getElementById(
+            'resume-total'
+        ).textContent = '0';
+
+        const carteRepartition =
+            document.getElementById('distribution-card');
+
+        carteRepartition.style.display = 'none';
+
+        document.getElementById(
+            'distribution-list'
+        ).innerHTML = '';
+    }
+
+    function afficherRepartition(details, telephones) {
+        const carte =
+            document.getElementById('distribution-card');
+
+        const liste =
             document.getElementById('distribution-list');
 
-        conteneur.innerHTML = '';
+        liste.innerHTML = '';
 
-        if (!Array.isArray(montants) || montants.length === 0) {
-            conteneur.innerHTML = `
-                <p class="empty-distribution">
-                    Saisissez le montant et les numéros pour afficher
-                    la répartition.
-                </p>
-            `;
-
+        if (!Array.isArray(details) || details.length === 0) {
+            carte.style.display = 'none';
             return;
         }
 
-        montants.forEach(function (montant, index) {
+        details.forEach(function (detail, index) {
             const ligne = document.createElement('div');
 
-            ligne.className = 'distribution-item';
+            ligne.className = 'distribution-row';
 
-            const telephone =
-                telephones[index] || 'Destinataire ' + (index + 1);
+            let montant = 0;
+            let montantRecu = 0;
+
+            if (typeof detail === 'object') {
+                montant = detail.montant || 0;
+                montantRecu =
+                    detail.montant_recu ?? montant;
+            } else {
+                montant = detail;
+                montantRecu = detail;
+            }
 
             ligne.innerHTML = `
                 <span class="distribution-phone">
-                    ${telephone}
+                    ${telephones[index] || 'Destinataire ' + (index + 1)}
                 </span>
 
                 <span class="distribution-amount">
                     ${formaterMontant(montant)} Ar
+                    <br>
+                    reçu : ${formaterMontant(montantRecu)} Ar
                 </span>
             `;
 
-            conteneur.appendChild(ligne);
+            liste.appendChild(ligne);
         });
-    }
 
-    function reinitialiserResume() {
-        document.getElementById('resume-frais').textContent = '0';
-        document.getElementById('resume-commission').textContent = '0';
-        document.getElementById('resume-montant-recu').textContent = '0';
-        document.getElementById('resume-total').textContent = '0';
+        carte.style.display = 'block';
     }
 
     async function calculerTransfertMultiple() {
@@ -912,39 +858,42 @@ document.addEventListener('DOMContentLoaded', function () {
         const telephones =
             obtenirTelephones();
 
-        const nombreDestinataires =
+        const nombre =
             telephones.length;
 
-        document.getElementById('resume-nombre').textContent =
-            nombreDestinataires;
-
-        document.getElementById('resume-montant-total').textContent =
-            formaterMontant(montantTotal);
-
         const montantMoyen =
-            nombreDestinataires > 0
-                ? Math.floor(montantTotal / nombreDestinataires)
+            nombre > 0
+                ? Math.floor(montantTotal / nombre)
                 : 0;
+
+        document.getElementById(
+            'resume-nombre'
+        ).textContent = nombre;
 
         document.getElementById(
             'resume-montant-individuel'
         ).textContent = formaterMontant(montantMoyen);
 
+        const numerosValides =
+            telephones.every(function (telephone) {
+                return telephone.length === 10;
+            });
+
         if (
             montantTotal <= 0 ||
-            nombreDestinataires < 2 ||
-            telephones.some(function (telephone) {
-                return telephone.length !== 10;
-            })
+            nombre < 2 ||
+            !numerosValides
         ) {
-            reinitialiserResume();
-            afficherRepartition([], telephones);
+            reinitialiserResultats();
             return;
         }
 
         const donnees = new FormData();
 
-        donnees.append('montant_total', montantTotal);
+        donnees.append(
+            'montant_total',
+            montantTotal
+        );
 
         donnees.append(
             'prise_en_charge_commission',
@@ -952,14 +901,20 @@ document.addEventListener('DOMContentLoaded', function () {
         );
 
         telephones.forEach(function (telephone) {
-            donnees.append('telephones[]', telephone);
+            donnees.append(
+                'telephones[]',
+                telephone
+            );
         });
 
-        donnees.append(csrfName, csrfHash);
+        donnees.append(
+            csrfName,
+            csrfHash
+        );
 
         try {
             const reponse = await fetch(
-                '<?= site_url('client/transfert-multiple/calculer') ?>',
+                '<?= site_url('transfert-multiple/calculer') ?>',
                 {
                     method: 'POST',
                     body: donnees,
@@ -975,16 +930,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 csrfHash = resultat.csrf_hash;
             }
 
-            if (!reponse.ok || resultat.success === false) {
-                reinitialiserResume();
-                afficherRepartition([], telephones);
+            if (
+                !reponse.ok ||
+                resultat.success === false
+            ) {
+                reinitialiserResultats();
                 return;
             }
 
-            document.getElementById('resume-frais').textContent =
+            document.getElementById(
+                'resume-frais'
+            ).textContent =
                 formaterMontant(resultat.total_frais);
 
-            document.getElementById('resume-commission').textContent =
+            document.getElementById(
+                'resume-commission'
+            ).textContent =
                 formaterMontant(resultat.total_commission);
 
             document.getElementById(
@@ -992,123 +953,162 @@ document.addEventListener('DOMContentLoaded', function () {
             ).textContent =
                 formaterMontant(resultat.total_montant_recu);
 
-            document.getElementById('resume-total').textContent =
+            document.getElementById(
+                'resume-total'
+            ).textContent =
                 formaterMontant(resultat.total_a_debiter);
 
+            const repartition =
+                resultat.details ??
+                resultat.montants_individuels ??
+                [];
+
             afficherRepartition(
-                resultat.montants_individuels,
+                repartition,
                 telephones
             );
         } catch (erreur) {
-            reinitialiserResume();
+            reinitialiserResultats();
         }
     }
 
-    boutonAjouter.addEventListener('click', function () {
-        creerDestinataire();
-        calculerTransfertMultiple();
-    });
+    function planifierCalcul() {
+        clearTimeout(minuteurCalcul);
 
-    listeDestinataires.addEventListener('click', function (event) {
-        if (!event.target.classList.contains('btn-remove')) {
-            return;
+        minuteurCalcul = setTimeout(
+            calculerTransfertMultiple,
+            350
+        );
+    }
+
+    boutonAjouter.addEventListener(
+        'click',
+        function () {
+            ajouterDestinataire();
+            planifierCalcul();
         }
+    );
 
-        const lignes =
-            listeDestinataires.querySelectorAll('.recipient-row');
+    listeDestinataires.addEventListener(
+        'click',
+        function (event) {
+            if (
+                !event.target.classList.contains(
+                    'remove-button'
+                )
+            ) {
+                return;
+            }
 
-        if (lignes.length <= 2) {
-            return;
+            const lignes =
+                listeDestinataires.querySelectorAll(
+                    '.recipient-row'
+                );
+
+            if (lignes.length <= 2) {
+                return;
+            }
+
+            event.target
+                .closest('.recipient-row')
+                .remove();
+
+            mettreAJourNumerotation();
+            planifierCalcul();
         }
+    );
 
-        event.target.closest('.recipient-row').remove();
+    listeDestinataires.addEventListener(
+        'input',
+        function (event) {
+            if (
+                !event.target.classList.contains(
+                    'telephone-input'
+                )
+            ) {
+                return;
+            }
 
-        mettreAJourNumeros();
-        calculerTransfertMultiple();
-    });
+            event.target.value =
+                event.target.value
+                    .replace(/\D/g, '')
+                    .slice(0, 10);
 
-    listeDestinataires.addEventListener('input', function (event) {
-        if (!event.target.classList.contains('telephone-input')) {
-            return;
+            planifierCalcul();
         }
-
-        event.target.value =
-            event.target.value.replace(/\D/g, '').slice(0, 10);
-
-        calculerTransfertMultiple();
-    });
+    );
 
     montantInput.addEventListener(
         'input',
-        calculerTransfertMultiple
+        planifierCalcul
     );
 
     priseEnChargeInput.addEventListener(
         'change',
-        calculerTransfertMultiple
+        planifierCalcul
     );
 
-    form.addEventListener('submit', function (event) {
-        const montantTotal =
-            parseInt(montantInput.value, 10) || 0;
+    formulaire.addEventListener(
+        'submit',
+        function (event) {
+            const montant =
+                parseInt(montantInput.value, 10) || 0;
 
-        const telephones =
-            obtenirTelephones();
+            const telephones =
+                obtenirTelephones();
 
-        let valide = true;
+            const erreurMontant =
+                document.getElementById('erreur-montant');
 
-        document.getElementById('erreur-montant').textContent = '';
-        document.getElementById(
-            'erreur-destinataires'
-        ).textContent = '';
+            const erreurDestinataires =
+                document.getElementById(
+                    'erreur-destinataires'
+                );
 
-        if (montantTotal <= 0) {
-            document.getElementById('erreur-montant').textContent =
-                'Veuillez saisir un montant total valide.';
+            erreurMontant.textContent = '';
+            erreurDestinataires.textContent = '';
 
-            valide = false;
+            let valide = true;
+
+            if (montant <= 0) {
+                erreurMontant.textContent =
+                    'Veuillez saisir un montant valide.';
+
+                valide = false;
+            }
+
+            if (telephones.length < 2) {
+                erreurDestinataires.textContent =
+                    'Ajoutez au moins deux destinataires.';
+
+                valide = false;
+            } else if (
+                telephones.some(function (telephone) {
+                    return telephone.length !== 10;
+                })
+            ) {
+                erreurDestinataires.textContent =
+                    'Chaque numéro doit contenir exactement 10 chiffres.';
+
+                valide = false;
+            } else if (
+                new Set(telephones).size !== telephones.length
+            ) {
+                erreurDestinataires.textContent =
+                    'Un même numéro ne peut pas être saisi plusieurs fois.';
+
+                valide = false;
+            }
+
+            if (!valide) {
+                event.preventDefault();
+            }
         }
+    );
 
-        if (telephones.length < 2) {
-            document.getElementById(
-                'erreur-destinataires'
-            ).textContent =
-                'Vous devez saisir au moins deux destinataires.';
-
-            valide = false;
-        }
-
-        if (
-            telephones.some(function (telephone) {
-                return telephone.length !== 10;
-            })
-        ) {
-            document.getElementById(
-                'erreur-destinataires'
-            ).textContent =
-                'Chaque numéro doit contenir exactement 10 chiffres.';
-
-            valide = false;
-        }
-
-        if (
-            new Set(telephones).size !== telephones.length
-        ) {
-            document.getElementById(
-                'erreur-destinataires'
-            ).textContent =
-                'Un même numéro ne peut pas apparaître plusieurs fois.';
-
-            valide = false;
-        }
-
-        if (!valide) {
-            event.preventDefault();
-        }
-    });
-
-    mettreAJourNumeros();
+    mettreAJourNumerotation();
 });
 </script>
 
-<?= $this->endSection() ?>
+</body>
+</html>
