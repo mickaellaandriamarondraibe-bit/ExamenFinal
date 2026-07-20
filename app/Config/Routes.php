@@ -13,8 +13,6 @@ $routes->post('login', 'ClientController::login');
 $routes->get('gains', 'GainController::index');
 
 
-
-
 /* Client - vues côté client */
 $routes->get('accueil', 'DashboardController::index');
 
@@ -47,6 +45,8 @@ $routes->group('client', ['filter' => 'auth:client'], function ($routes) {
 /* Cote operateur */
 $routes->group('operateur', ['filter' => 'auth:operateur'], function ($routes) {
     $routes->get('client', 'ClientController::getAllclient');
+
+    $routes->get('historique2/(:num)', 'TransactionController::historique2/$1');
 
     /* CRUD prefixe */
     $routes->get('prefixes', 'PrefixController::index');

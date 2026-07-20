@@ -329,6 +329,37 @@ class TransactionController extends BaseController
             'recevra'  => $montant,            // ce que le destinataire/le client reçoit
         ]);
     }
+
+    public function historique2($id)
+{
+    $transactionModel = new TransactionModel();
+    $compteModel = new CompteModel();
+
+    $compte = $compteModel->find($id);
+
+    if (!$compte) {
+        return redirect()->to('/operateur/compte')
+            ->with('error', 'Compte introuvable');
+    }
+
+    $transactionsBrutes = $transactionModel->getHistorique($compte['id']);
+
+    // Ajouter le champ "sens" (in/out) pour chaque transaction
+    $transactions = array_map(function ($t) use ($compte) {
+        $t['sens'] = ($t['compte_destination_id'] == $compte['id']) ? 'in' : 'out';
+
+        return $t;
+    }, $transactionsBrutes);
+
+    $data = [
+        'title' => 'Historique du compte',
+        'transactions' => $transactions,
+        'compte' => $compte,
+        'compte_id' => $compte['id']
+    ];
+
+    return view('transaction/historique2', $data);
+}
 public function getHistorique($compte_id)
 {
     $transactionModel = new TransactionModel();

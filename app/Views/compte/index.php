@@ -50,16 +50,8 @@
                         </td>
 
                         <td>
-                            <a href="<?= base_url('operateur/compte/historique/' . $compte['id']) ?>" class="btn btn-info btn-sm">
+                            <a href="<?= base_url('operateur/historique2/' . $compte['id']) ?>" class="btn btn-info btn-sm">
                                 Voir
-                            </a>
-
-                            <a href="<?= base_url('operateur/compte/edit/' . $compte['id']) ?>" class="btn btn-warning btn-sm">
-                                Modifier
-                            </a>
-
-                            <a href="<?= base_url('operateur/compte/delete/' . $compte['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce compte ?')">
-                                Supprimer
                             </a>
                         </td>
                     </tr>
