@@ -36,12 +36,16 @@ CREATE TABLE types_operations (
 CREATE TABLE baremes_frais (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     type_operation_id INTEGER NOT NULL,
+    autre_operateur_id INTEGER,
     montant_min REAL NOT NULL,
     montant_max REAL NOT NULL,
     frais REAL NOT NULL,
 
     FOREIGN KEY (type_operation_id)
-        REFERENCES types_operations(id)
+        REFERENCES types_operations(id),
+
+    FOREIGN KEY (autre_operateur_id)
+        REFERENCES autre_operateur(id)
 );
 
 CREATE TABLE clients (
@@ -84,9 +88,6 @@ CREATE TABLE transactions (
     FOREIGN KEY (compte_destination_id)
         REFERENCES comptes(id)
 );
-
-
-
 
 
 -- Autres opérateurs
@@ -132,3 +133,19 @@ VALUES
 (3, 100001, 1000000, 2000);
 
 
+INSERT INTO baremes_frais (
+    type_operation_id,
+    autre_operateur_id,
+    montant_min,
+    montant_max,
+    frais
+)
+VALUES
+-- Retrait chez notre opérateur
+(2, NULL, 500, 1000, 50),
+
+-- Retrait chez Orange
+(2, 1, 500, 1000, 100),
+
+-- Retrait chez Airtel
+(2, 2, 500, 1000, 150);

@@ -171,7 +171,7 @@ class TransactionController extends BaseController
         return view('transaction/transfert');
     }
 
-   public function enregistrerTransfert()
+public function enregistrerTransfert()
 {
     $compteModel = new CompteModel();
     $prefixModel = new PrefixModel();
@@ -179,165 +179,234 @@ class TransactionController extends BaseController
     $baremeFraisModel = new BaremeFraisModel();
     $commissionModel = new CommissionInterOperateurModel();
 
-    if ($this->request->is('post')) {
+    if (!$this->request->is('post')) {
+        return view('transaction/transfert');
+    }
 
-        $montant = (float) $this->request->getPost('montant');
-        $telephoneDestinataire = $this->request->getPost('telephone');
-        $telephoneDestinataire = preg_replace('/\D/', '', $telephoneDestinataire);
-        $client_id = session()->get('client_id');
+    $montant = (float) $this->request->getPost('montant');
 
-        if (!$client_id) {
-            return redirect()->to('/');
-        }
+    $telephoneDestinataire = preg_replace(
+        '/\D/',
+        '',
+        (string) $this->request->getPost('telephone')
+    );
 
-        if (!$montant || $montant <= 0) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Montant invalide');
-        }
+    $priseEnChargeCommission = $this->request
+        ->getPost('prise_en_charge_commission') ? 1 : 0;
 
-        if (strlen($telephoneDestinataire) != 10) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Numéro du destinataire invalide');
-        }
+    $clientId = session()->get('client_id');
 
-        // Compte source
-        $compteSource = $compteModel->getCompteByClientId($client_id);
+    if (!$clientId) {
+        return redirect()->to('/');
+    }
 
-        if (!$compteSource) {
-            return redirect()->back()
-                ->with('error', 'Compte source introuvable');
-        }
+    if ($montant <= 0) {
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'Montant invalide');
+    }
 
-        // Vérifier le préfixe du numéro destinataire
-        $prefixe = substr($telephoneDestinataire, 0, 3);
+    if (strlen($telephoneDestinataire) !== 10) {
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'Numéro du destinataire invalide');
+    }
 
-        $prefixData = $prefixModel->findByPrefixe($prefixe);
+    // Compte source
+    $compteSource = $compteModel->getCompteByClientId($clientId);
 
-        if (!$prefixData) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Préfixe non valide ou inactif');
-        }
+    if (!$compteSource) {
+        return redirect()->back()
+            ->with('error', 'Compte source introuvable');
+    }
 
-        // Compte destination
-        $compteDestination = $compteModel->getCompteByTelephone(
-            $telephoneDestinataire
-        );
+    // Vérification du préfixe
+    $prefixe = substr($telephoneDestinataire, 0, 3);
 
-        if (!$compteDestination) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Destinataire introuvable');
-        }
+    $prefixData = $prefixModel->findByPrefixe($prefixe);
 
-        if ($compteSource['id'] == $compteDestination['id']) {
-            return redirect()->back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'Vous ne pouvez pas transférer vers votre propre compte'
-                );
-        }
+    if (!$prefixData) {
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'Préfixe non valide ou inactif');
+    }
 
-        $type_operation_id = 3; // TRANSFERT
+    /*
+     * NULL signifie que le numéro appartient à notre opérateur.
+     * Une valeur signifie que le numéro appartient à un autre opérateur.
+     */
+    $autreOperateurId = !empty($prefixData['autre_operateur_id'])
+        ? (int) $prefixData['autre_operateur_id']
+        : null;
 
-        // Frais normaux du transfert selon le barème
-        $bareme = $baremeFraisModel->getFraisByMontant(
-            $type_operation_id,
-            $montant
-        );
+    // Compte destination
+    $compteDestination = $compteModel->getCompteByTelephone(
+        $telephoneDestinataire
+    );
 
-        $fraisTransfert = $bareme ? (float) $bareme['frais'] : 0;
+    if (!$compteDestination) {
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'Destinataire introuvable');
+    }
 
-        // Commission appliquée seulement pour un autre opérateur
-        $commission = 0;
-        $pourcentageCommission = 0;
-
-        if (!empty($prefixData['autre_operateur_id'])) {
-
-            $commissionData = $commissionModel->getByAutreOperateurId(
-                $prefixData['autre_operateur_id']
-            );
-
-            if (!$commissionData) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with(
-                        'error',
-                        'Commission de cet opérateur non configurée'
-                    );
-            }
-
-            $pourcentageCommission = (float) $commissionData['pourcentage'];
-
-            $commission = round(
-                $montant * $pourcentageCommission / 100
-            );
-        }
-
-        // frais du barème + commission inter-opérateur
-        $fraisTotal = $fraisTransfert + $commission;
-
-        // Montant total retiré du compte source
-        $totalADebiter = $montant + $fraisTotal;
-
-        if ($compteSource['solde'] < $totalADebiter) {
-            return redirect()->back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'Solde insuffisant. Total requis : '
-                    . number_format($totalADebiter, 0, ',', ' ')
-                    . ' Ar'
-                );
-        }
-
-        $insertedId = $transactionModel->enregistrerTransfert(
-            $compteSource['id'],
-            $compteDestination['id'],
-            $type_operation_id,
-            $montant,
-            $fraisTotal
-        );
-
-        if (!$insertedId) {
-            return redirect()->back()
-                ->with(
-                    'error',
-                    "Erreur lors de l'enregistrement de la transaction"
-                );
-        }
-
-        // Débiter la source :
-        // montant + frais de transfert + commission
-        $compteModel->update($compteSource['id'], [
-            'solde' => $compteSource['solde'] - $totalADebiter
-        ]);
-
-        // Créditer la destination avec le montant envoyé uniquement
-        $compteModel->update($compteDestination['id'], [
-            'solde' => $compteDestination['solde'] + $montant
-        ]);
-
-        return redirect()->to('/solde')
+    if ((int) $compteSource['id'] === (int) $compteDestination['id']) {
+        return redirect()->back()
+            ->withInput()
             ->with(
-                'success',
-                'Transfert effectué avec succès. '
-                . 'Montant : '
-                . number_format($montant, 0, ',', ' ')
-                . ' Ar, frais de transfert : '
-                . number_format($fraisTransfert, 0, ',', ' ')
-                . ' Ar, commission : '
-                . number_format($commission, 0, ',', ' ')
-                . ' Ar, total débité : '
+                'error',
+                'Vous ne pouvez pas transférer vers votre propre compte'
+            );
+    }
+
+    $typeOperationId = 3; // TRANSFERT
+
+    // Recherche des frais selon le montant et l’opérateur
+    $bareme = $baremeFraisModel->getFraisByMontant(
+        $typeOperationId,
+        $montant,
+        $autreOperateurId
+    );
+
+    if (!$bareme) {
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                'Aucun barème de transfert ne correspond à ce montant'
+            );
+    }
+
+    $frais = (float) $bareme['frais'];
+
+    // Commission appliquée uniquement vers un autre opérateur
+    $commission = 0;
+    $pourcentageCommission = 0;
+
+    if ($autreOperateurId !== null) {
+        $commissionData = $commissionModel->getByAutreOperateurId(
+            $autreOperateurId
+        );
+
+        if (!$commissionData) {
+            return redirect()->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Commission inter-opérateur non configurée'
+                );
+        }
+
+        $pourcentageCommission = (float) $commissionData['pourcentage'];
+
+        $commission = round(
+            $montant * $pourcentageCommission / 100
+        );
+    }
+
+    /*
+     * Case cochée :
+     * le client paie la commission en supplément.
+     *
+     * Case non cochée :
+     * la commission est retirée du montant reçu.
+     */
+    if ($priseEnChargeCommission === 1) {
+        $montantRecu = $montant;
+        $totalADebiter = $montant + $frais + $commission;
+    } else {
+        $montantRecu = $montant - $commission;
+        $totalADebiter = $montant + $frais;
+    }
+
+    if ($montantRecu <= 0) {
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                'La commission est supérieure ou égale au montant envoyé'
+            );
+    }
+
+    if ((float) $compteSource['solde'] < $totalADebiter) {
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                'Solde insuffisant. Total requis : '
                 . number_format($totalADebiter, 0, ',', ' ')
                 . ' Ar'
             );
     }
 
-    return view('transaction/transfert');
+    /*
+     * Transaction SQL :
+     * soit toutes les opérations réussissent,
+     * soit aucune modification n’est conservée.
+     */
+    $db = db_connect();
+    $db->transStart();
+
+    $insertedId = $transactionModel->enregistrerTransfert(
+        $compteSource['id'],
+        $compteDestination['id'],
+        $typeOperationId,
+        $montant,
+        $montantRecu,
+        $frais,
+        $commission,
+        $priseEnChargeCommission,
+        $autreOperateurId
+    );
+
+    if (!$insertedId) {
+        $db->transRollback();
+
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                "Erreur lors de l'enregistrement de la transaction"
+            );
+    }
+
+    // Débiter le compte source
+    $compteModel->update($compteSource['id'], [
+        'solde' => (float) $compteSource['solde'] - $totalADebiter
+    ]);
+
+    // Créditer le montant réellement reçu
+    $compteModel->update($compteDestination['id'], [
+        'solde' => (float) $compteDestination['solde'] + $montantRecu
+    ]);
+
+    $db->transComplete();
+
+    if ($db->transStatus() === false) {
+        return redirect()->back()
+            ->withInput()
+            ->with(
+                'error',
+                "Erreur lors de l'exécution du transfert"
+            );
+    }
+
+    return redirect()->to('/solde')
+        ->with(
+            'success',
+            'Transfert effectué avec succès. '
+            . 'Montant saisi : '
+            . number_format($montant, 0, ',', ' ')
+            . ' Ar, montant reçu : '
+            . number_format($montantRecu, 0, ',', ' ')
+            . ' Ar, frais : '
+            . number_format($frais, 0, ',', ' ')
+            . ' Ar, commission : '
+            . number_format($commission, 0, ',', ' ')
+            . ' Ar, total débité : '
+            . number_format($totalADebiter, 0, ',', ' ')
+            . ' Ar'
+        );
 }
 
     // HISTORIQUE
