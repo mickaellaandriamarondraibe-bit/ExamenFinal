@@ -40,10 +40,10 @@
       </div>
 
       <div class="card">
-        <div class="detail-row"><span>Frais</span><span>—</span></div>
-        <div class="detail-row"><span>Le destinataire recevra</span><span>—</span></div>
-        <div class="detail-row total"><span>Total débité</span><span class="val">—</span></div>
-      </div>
+        <div class="detail-row"><span>Frais</span><span id="frais">0 Ar</span></div>
+        <div class="detail-row"><span>Le destinataire recevra</span><span id="recevra">0 Ar</span></div>
+        <div class="detail-row total"><span>Total débité</span><span class="val" id="total">0 Ar</span></div>
+        </div>
 
       <button type="submit" class="btn-primary">Confirmer le transfert</button>
     </form>
@@ -52,5 +52,42 @@
   <?= view('templates/bottom_nav', ['active' => 'transfert']) ?>
 </div>
 
+        <script>
+const montantInput = document.getElementById('montant');
+const fraisEl = document.getElementById('frais');
+const recevraEl = document.getElementById('recevra');
+const totalEl = document.getElementById('total');
+let timer;
+
+function formatAr(n) {
+  return new Intl.NumberFormat('fr-FR').format(n) + ' Ar';
+}
+
+montantInput.addEventListener('input', function () {
+  clearTimeout(timer);
+  const montant = parseFloat(this.value) || 0;
+
+  if (montant <= 0) {
+    fraisEl.textContent = '0 Ar';
+    recevraEl.textContent = '0 Ar';
+    totalEl.textContent = '0 Ar';
+    return;
+  }
+
+  timer = setTimeout(() => {
+    fetch('<?= site_url('calculer-frais') ?>', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `montant=${montant}&type_operation_id=3`
+    })
+      .then(res => res.json())
+      .then(data => {
+        fraisEl.textContent = formatAr(data.frais);
+        recevraEl.textContent = formatAr(data.montant);
+        totalEl.textContent = formatAr(data.total);
+      });
+  }, 400);
+});
+</script>
 </body>
 </html>

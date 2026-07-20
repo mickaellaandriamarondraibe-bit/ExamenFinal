@@ -63,3 +63,6 @@ $routes->post('transfert', 'TransactionController::enregistrerTransfert');
 $routes->get('solde', 'ClientController::solde');
 
 $routes->get('historique', 'TransactionController::historique');
+
+
+$routes->post('calculer-frais', 'TransactionController::calculerFrais');

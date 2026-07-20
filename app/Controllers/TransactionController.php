@@ -288,4 +288,31 @@ class TransactionController extends BaseController
 
         return view('transaction/historique', $data);
     }
+
+
+
+    public function calculerFrais()
+    {
+        $baremeFraisModel = new BaremeFraisModel();
+
+        $montant = (float) $this->request->getPost('montant');
+        $type_operation_id = (int) $this->request->getPost('type_operation_id');
+
+        if ($montant <= 0) {
+            return $this->response->setJSON([
+                'frais' => 0,
+                'total' => 0,
+            ]);
+        }
+
+        $bareme = $baremeFraisModel->getFraisByMontant($type_operation_id, $montant);
+        $frais = $bareme ? (float) $bareme['frais'] : 0;
+
+        return $this->response->setJSON([
+            'frais'    => $frais,
+            'montant'  => $montant,
+            'total'    => $montant + $frais,   // pour retrait/transfert (débit)
+            'recevra'  => $montant,            // ce que le destinataire/le client reçoit
+        ]);
+    }
 }

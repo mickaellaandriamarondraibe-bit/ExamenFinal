@@ -32,10 +32,12 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="detail-row"><span>Frais</span><span>0 Ar</span></div>
-        <div class="detail-row"><span>Vous allez recevoir</span><span>0 Ar</span></div>
-      </div>
+     
+
+<div class="card">
+  <div class="detail-row"><span>Frais</span><span id="frais">0 Ar</span></div>
+  <div class="detail-row"><span>Vous allez recevoir</span><span id="recevra">0 Ar</span></div>
+</div>
 
       <div style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">Points de dépôt disponibles</div>
       <div class="card-white">
@@ -50,5 +52,39 @@
   <?= view('templates/bottom_nav', ['active' => 'depot']) ?>
 </div>
 
+<script>
+const montantInput = document.getElementById('montant');
+const fraisEl = document.getElementById('frais');
+const recevraEl = document.getElementById('recevra');
+let timer;
+
+function formatAr(n) {
+  return new Intl.NumberFormat('fr-FR').format(n) + ' Ar';
+}
+
+montantInput.addEventListener('input', function () {
+  clearTimeout(timer);
+  const montant = parseFloat(this.value) || 0;
+
+  if (montant <= 0) {
+    fraisEl.textContent = '0 Ar';
+    recevraEl.textContent = '0 Ar';
+    return;
+  }
+
+  timer = setTimeout(() => {
+    fetch('<?= site_url('calculer-frais') ?>', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `montant=${montant}&type_operation_id=1`
+    })
+      .then(res => res.json())
+      .then(data => {
+        fraisEl.textContent = formatAr(data.frais);
+        recevraEl.textContent = formatAr(data.recevra);
+      });
+  }, 400); // attend 400ms après la dernière frappe (debounce)
+});
+</script>
 </body>
 </html>
