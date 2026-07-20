@@ -10,6 +10,20 @@ use App\Models\BaremeFraisModel;
 class TransactionController extends BaseController
 {
 
+     public function index()
+    {
+        $transactionModel = new TransactionModel();
+
+        $data = [
+            'title' => 'Liste des transactions',
+            'transactions' => $transactionModel
+                ->orderBy('date_transaction', 'DESC')
+                ->findAll()
+        ];
+
+        return view('transaction/all', $data);
+    }
+
     // DEPOT
 
 

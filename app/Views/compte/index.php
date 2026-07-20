@@ -38,7 +38,7 @@
                         </td>
 
                         <td>
-                            <?php if ($compte['actif'] == 1): ?>
+                           <?php if ($compte['statut'] == 'ACTIF'): ?>
                                 <span class="badge bg-success">
                                     Actif
                                 </span>

@@ -105,4 +105,15 @@ class ClientController extends BaseController
 
     return view('clients/solde', $data);
 }
+
+public function getAllclient(){
+        $ClientModel = new ClientModel();
+
+            $data = [
+                'title' => 'Liste des clients',
+                'clients' => $ClientModel->findAll()
+            ];
+
+            return view('client/index', $data);
+    }
 }

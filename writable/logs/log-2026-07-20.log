@@ -651,3 +651,134 @@ DEBUG - 2026-07-20 10:04:54 --> Session: Class initialized using 'CodeIgniter\Se
 DEBUG - 2026-07-20 10:04:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 DEBUG - 2026-07-20 10:04:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
 >>>>>>> 576480a542bf76b73e9ea4aeccf9e76618efdc09
+CRITICAL - 2026-07-20 10:36:09 --> ErrorException: Undefined array key "actif"
+[Method: GET, Route: operateur/compte]
+in APPPATH/Views/compte/index.php on line 41.
+ 1 APPPATH/Views/compte/index.php(41): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/View/View.php(240): include('/home/idealy/Documents/S4/Sys Info Mr Rojo/ExamenFinal/app/Views/compte/index.php')
+ 3 SYSTEMPATH/View/View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 5 APPPATH/Controllers/CompteController.php(19): view()
+ 6 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\CompteController->index()
+ 7 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 9 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+11 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 10:36:20 --> ErrorException: Undefined array key "actif"
+[Method: GET, Route: operateur/compte]
+in APPPATH/Views/compte/index.php on line 41.
+ 1 APPPATH/Views/compte/index.php(41): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/View/View.php(240): include('/home/idealy/Documents/S4/Sys Info Mr Rojo/ExamenFinal/app/Views/compte/index.php')
+ 3 SYSTEMPATH/View/View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 5 APPPATH/Controllers/CompteController.php(19): view()
+ 6 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\CompteController->index()
+ 7 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 9 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+11 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 10:37:56 --> ErrorException: Undefined array key "actif"
+[Method: GET, Route: operateur/compte]
+in APPPATH/Views/compte/index.php on line 41.
+ 1 APPPATH/Views/compte/index.php(41): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/View/View.php(240): include('/home/idealy/Documents/S4/Sys Info Mr Rojo/ExamenFinal/app/Views/compte/index.php')
+ 3 SYSTEMPATH/View/View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 5 APPPATH/Controllers/CompteController.php(19): view()
+ 6 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\CompteController->index()
+ 7 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 9 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+11 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 10:41:43 --> ErrorException: Undefined array key "actif"
+[Method: GET, Route: operateur/compte]
+in APPPATH/Views/compte/index.php on line 41.
+ 1 APPPATH/Views/compte/index.php(41): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/View/View.php(240): include('/home/idealy/Documents/S4/Sys Info Mr Rojo/ExamenFinal/app/Views/compte/index.php')
+ 3 SYSTEMPATH/View/View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 5 APPPATH/Controllers/CompteController.php(19): view()
+ 6 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\CompteController->index()
+ 7 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 9 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+11 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 10:45:22 --> ErrorException: Undefined array key "actif"
+[Method: GET, Route: operateur/compte/edit/1]
+in APPPATH/Views/compte/edit.php on line 52.
+ 1 APPPATH/Views/compte/edit.php(52): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/View/View.php(240): include('/home/idealy/Documents/S4/Sys Info Mr Rojo/ExamenFinal/app/Views/compte/edit.php')
+ 3 SYSTEMPATH/View/View.php(243): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH/Common.php(1250): CodeIgniter\View\View->render()
+ 5 APPPATH/Controllers/CompteController.php(59): view()
+ 6 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\CompteController->edit()
+ 7 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 9 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+11 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+ERROR - 2026-07-20 10:45:44 --> UNIQUE constraint failed: prefixes.prefixe
+in SYSTEMPATH/Database/SQLite3/Connection.php on line 163.
+ 1 SYSTEMPATH/Database/SQLite3/Connection.php(163): SQLite3->exec()
+ 2 SYSTEMPATH/Database/BaseConnection.php(910): CodeIgniter\Database\SQLite3\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(2521): CodeIgniter\Database\BaseConnection->query()
+ 5 SYSTEMPATH/Model.php(406): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH/BaseModel.php(1074): CodeIgniter\Model->doUpdate()
+ 7 SYSTEMPATH/Model.php(709): CodeIgniter\BaseModel->update()
+ 8 APPPATH/Controllers/PrefixController.php(55): CodeIgniter\Model->update()
+ 9 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\PrefixController->update()
+10 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+11 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+12 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+14 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 10:45:44 --> CodeIgniter\Database\Exceptions\DatabaseException: UNIQUE constraint failed: prefixes.prefixe
+[Method: POST, Route: operateur/prefixes/update/1]
+in SYSTEMPATH/Database/BaseConnection.php on line 865.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(2521): CodeIgniter\Database\BaseConnection->query()
+ 2 SYSTEMPATH/Model.php(406): CodeIgniter\Database\BaseBuilder->update()
+ 3 SYSTEMPATH/BaseModel.php(1074): CodeIgniter\Model->doUpdate()
+ 4 SYSTEMPATH/Model.php(709): CodeIgniter\BaseModel->update()
+ 5 APPPATH/Controllers/PrefixController.php(55): CodeIgniter\Model->update()
+ 6 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\PrefixController->update()
+ 7 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+ 9 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+11 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 10:45:44 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: UNIQUE constraint failed: prefixes.prefixe
+in SYSTEMPATH/Database/SQLite3/Connection.php on line 174.
+ 1 SYSTEMPATH/Database/BaseConnection.php(910): CodeIgniter\Database\SQLite3\Connection->execute()
+ 2 SYSTEMPATH/Database/BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 3 SYSTEMPATH/Database/BaseBuilder.php(2521): CodeIgniter\Database\BaseConnection->query()
+ 4 SYSTEMPATH/Model.php(406): CodeIgniter\Database\BaseBuilder->update()
+ 5 SYSTEMPATH/BaseModel.php(1074): CodeIgniter\Model->doUpdate()
+ 6 SYSTEMPATH/Model.php(709): CodeIgniter\BaseModel->update()
+ 7 APPPATH/Controllers/PrefixController.php(55): CodeIgniter\Model->update()
+ 8 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\PrefixController->update()
+ 9 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+10 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+11 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+12 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+13 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
+CRITICAL - 2026-07-20 10:45:44 --> [Caused by] SQLite3Exception: UNIQUE constraint failed: prefixes.prefixe
+in SYSTEMPATH/Database/SQLite3/Connection.php on line 163.
+ 1 SYSTEMPATH/Database/SQLite3/Connection.php(163): SQLite3->exec()
+ 2 SYSTEMPATH/Database/BaseConnection.php(910): CodeIgniter\Database\SQLite3\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(827): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(2521): CodeIgniter\Database\BaseConnection->query()
+ 5 SYSTEMPATH/Model.php(406): CodeIgniter\Database\BaseBuilder->update()
+ 6 SYSTEMPATH/BaseModel.php(1074): CodeIgniter\Model->doUpdate()
+ 7 SYSTEMPATH/Model.php(709): CodeIgniter\BaseModel->update()
+ 8 APPPATH/Controllers/PrefixController.php(55): CodeIgniter\Model->update()
+ 9 SYSTEMPATH/CodeIgniter.php(951): App\Controllers\PrefixController->update()
+10 SYSTEMPATH/CodeIgniter.php(497): CodeIgniter\CodeIgniter->runController()
+11 SYSTEMPATH/CodeIgniter.php(340): CodeIgniter\CodeIgniter->handleRequest()
+12 SYSTEMPATH/Boot.php(417): CodeIgniter\CodeIgniter->run()
+13 SYSTEMPATH/Boot.php(68): CodeIgniter\Boot::runCodeIgniter()
+14 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
