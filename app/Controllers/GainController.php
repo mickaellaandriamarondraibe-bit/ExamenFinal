@@ -2,18 +2,18 @@
 
 namespace App\Controllers;
 
-use App\Models\GainModel;
+use App\Models\TransactionModel;
 
 class GainController extends BaseController
 {
     public function index()
     {
-        $model = new GainModel();
+        $transactionModel = new TransactionModel();
 
         $data = [
             'title' => 'Situation des gains',
-            'totalGains' => $model->getTotalGains(),
-            'gainsParType' => $model->getGainsByType()
+            'gainsInternes' => $transactionModel->getGainsInternes(),
+            'gainsInterOperateurs' => $transactionModel->getGainsInterOperateurs()
         ];
 
         return view('gains/index', $data);

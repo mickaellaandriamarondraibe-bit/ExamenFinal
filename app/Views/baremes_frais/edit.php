@@ -2,50 +2,185 @@
 
 <?= $this->section('content') ?>
 
-<h2>Modifier un barème</h2>
+<div class="container-fluid">
 
-<form action="<?= base_url('operateur/baremes-frais/update/' . $bareme['id']) ?>" method="post">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Modifier un barème</h2>
+    </div>
 
-    <?= csrf_field() ?>
 
-    <div class="mb-3">
-        <label class="form-label">Type d'opération</label>
+    <form action="<?= base_url('operateur/baremes-frais/update/' . $bareme['id']) ?>" method="post">
 
-        <select name="type_operation_id" class="form-select" required>
-            <?php foreach ($types as $type): ?>
-                <option value="<?= $type['id'] ?>" <?= $type['id'] == $bareme['type_operation_id'] ? 'selected' : '' ?>>
-                    <?= esc($type['libelle']) ?>
+        <?= csrf_field() ?>
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Type d'opération
+            </label>
+
+
+            <select 
+                name="type_operation_id" 
+                class="form-select" 
+                required
+            >
+
+                <?php foreach ($types as $type): ?>
+
+                    <option 
+                        value="<?= $type['id'] ?>"
+                        <?= $type['id'] == $bareme['type_operation_id'] ? 'selected' : '' ?>
+                    >
+
+                        <?= esc($type['libelle']) ?>
+
+                    </option>
+
+                <?php endforeach; ?>
+
+
+            </select>
+
+        </div>
+
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Opérateur concerné
+            </label>
+
+
+            <select 
+                name="autre_operateur_id" 
+                class="form-select"
+            >
+
+                <option value="">
+                    Notre opérateur (Interne)
                 </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
 
-    <div class="mb-3">
-        <label class="form-label">Montant minimum</label>
 
-        <input type="number" name="montant_min" class="form-control" value="<?= $bareme['montant_min'] ?>" required>
-    </div>
+                <?php foreach ($operateurs as $operateur): ?>
 
-    <div class="mb-3">
-        <label class="form-label">Montant maximum</label>
+                    <option 
+                        value="<?= $operateur['id'] ?>"
+                        <?= $bareme['autre_operateur_id'] == $operateur['id'] ? 'selected' : '' ?>
+                    >
 
-        <input type="number" name="montant_max" class="form-control" value="<?= $bareme['montant_max'] ?>" required>
-    </div>
+                        <?= esc($operateur['nom']) ?>
 
-    <div class="mb-3">
-        <label class="form-label">Frais</label>
+                    </option>
 
-        <input type="number" name="frais" class="form-control" value="<?= $bareme['frais'] ?>" required>
-    </div>
+                <?php endforeach; ?>
 
-    <button type="submit" class="btn btn-primary">
-        Modifier
-    </button>
 
-    <a href="<?= base_url('operateur/baremes-frais') ?>" class="btn btn-secondary">
-        Annuler
-    </a>
+            </select>
 
-</form>
+
+            <small class="text-muted">
+                Laisser vide pour un barème interne.
+            </small>
+
+
+        </div>
+
+
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Montant minimum
+            </label>
+
+
+            <input 
+                type="number" 
+                name="montant_min" 
+                class="form-control"
+                value="<?= esc($bareme['montant_min']) ?>"
+                min="0"
+                required
+            >
+
+        </div>
+
+
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Montant maximum
+            </label>
+
+
+            <input 
+                type="number" 
+                name="montant_max" 
+                class="form-control"
+                value="<?= esc($bareme['montant_max']) ?>"
+                min="0"
+                required
+            >
+
+        </div>
+
+
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Frais
+            </label>
+
+
+            <input 
+                type="number" 
+                name="frais" 
+                class="form-control"
+                value="<?= esc($bareme['frais']) ?>"
+                min="0"
+                required
+            >
+
+        </div>
+
+
+
+
+        <div class="d-flex gap-2">
+
+            <button type="submit" class="btn btn-primary">
+
+                <i class="bi bi-check-lg"></i>
+                Modifier
+
+            </button>
+
+
+            <a 
+                href="<?= base_url('operateur/baremes-frais') ?>" 
+                class="btn btn-secondary"
+            >
+
+                Annuler
+
+            </a>
+
+
+        </div>
+
+
+    </form>
+
+
+</div>
+
 
 <?= $this->endSection() ?>

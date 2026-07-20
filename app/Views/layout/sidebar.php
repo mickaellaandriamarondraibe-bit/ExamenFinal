@@ -24,6 +24,11 @@
             <span>Types d'opérations</span>
         </a>
 
+        <a href="<?= base_url('operateur/autres_operateurs') ?>" class="sidebar-link">
+            <i class="bi bi-list-ul"></i>
+            <span>Autres operateurs</span>
+        </a>
+
         <a href="<?= base_url('operateur/baremes-frais') ?>" class="sidebar-link">
             <i class="bi bi-cash-stack"></i>
             <span>Barèmes de frais</span>
@@ -37,6 +42,11 @@
         <a href="<?= base_url('operateur/gains') ?>" class="sidebar-link">
             <i class="bi bi-graph-up"></i>
             <span>Situation des gains</span>
+        </a>
+
+        <a href="<?= base_url('operateur/montants-operateurs') ?>" class="sidebar-link">
+            <i class="bi bi-send"></i>
+            <span>Montants à envoyer</span>
         </a>
     </nav>
 

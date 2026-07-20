@@ -13,8 +13,6 @@ $routes->post('login', 'ClientController::login');
 $routes->get('gains', 'GainController::index');
 
 
-
-
 /* Client - vues côté client */
 $routes->get('accueil', 'DashboardController::index');
 
@@ -31,7 +29,20 @@ $routes->get('solde', 'ClientController::solde');
 
 $routes->get('historique', 'TransactionController::historique');
 
+$routes->get(
+    'transfert-multiple',
+    'TransactionController::transfertMultiple'
+);
 
+$routes->post(
+    'transfert-multiple',
+    'TransactionController::enregistrerTransfertMultiple'
+);
+
+$routes->post(
+    'transfert-multiple/calculer',
+    'TransactionController::calculerFraisTransfertMultiple'
+);
 $routes->post('calculer-frais', 'TransactionController::calculerFrais');
 $routes->get('operateur/login', 'OperateurController::loginPage');
 $routes->post('operateur/login', 'OperateurController::login');
@@ -47,6 +58,8 @@ $routes->group('client', ['filter' => 'auth:client'], function ($routes) {
 /* Cote operateur */
 $routes->group('operateur', ['filter' => 'auth:operateur'], function ($routes) {
     $routes->get('client', 'ClientController::getAllclient');
+
+    $routes->get('historique2/(:num)', 'TransactionController::historique2/$1');
 
     /* CRUD prefixe */
     $routes->get('prefixes', 'PrefixController::index');
@@ -64,7 +77,19 @@ $routes->group('operateur', ['filter' => 'auth:operateur'], function ($routes) {
     $routes->post('types-operations/update/(:num)', 'TypeOperationController::update/$1');
     $routes->get('types-operations/delete/(:num)', 'TypeOperationController::delete/$1');
 
-    /* CRUD bareme */
+    /* CRUD autres operateurs */
+    $routes->get('autres_operateurs', 'AutreOperateurController::index');
+    $routes->get('autres_operateurs/create', 'AutreOperateurController::create');
+    $routes->post('autres_operateurs/store', 'AutreOperateurController::store');
+    $routes->get('autres_operateurs/edit/(:num)', 'AutreOperateurController::edit/$1');
+    $routes->post('autres_operateurs/update/(:num)', 'AutreOperateurController::update/$1');
+    $routes->get('autres_operateurs/delete/(:num)', 'AutreOperateurController::delete/$1');
+
+    $routes->get(
+    'montants-operateurs',
+    'TransactionController::montantsOperateurs'
+    );
+        /* CRUD bareme */
     $routes->get('baremes-frais', 'BaremeFraisController::index');
     $routes->get('baremes-frais/create', 'BaremeFraisController::create');
     $routes->post('baremes-frais/store', 'BaremeFraisController::store');
