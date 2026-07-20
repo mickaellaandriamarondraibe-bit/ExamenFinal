@@ -6,16 +6,20 @@ use App\Models\GainModel;
 
 class GainController extends BaseController
 {
-    public function index()
+   
+
+     public function index()
     {
-        $model = new GainModel();
+        $transactionModel = new TransactionModel();
 
         $data = [
             'title' => 'Situation des gains',
-            'totalGains' => $model->getTotalGains(),
-            'gainsParType' => $model->getGainsByType()
+            'gainsInternes' => $transactionModel->getGainsInternes(),
+            'gainsInterOperateurs' => $transactionModel->getGainsInterOperateurs()
         ];
 
         return view('gains/index', $data);
     }
 }
+
+

@@ -66,4 +66,27 @@ class TransactionModel extends Model
                 ->orderBy('date_transaction', 'DESC')
                 ->findAll();
 }
+
+public function getGainsInternes()
+{
+    return $this
+        ->selectSum('transactions.frais', 'total')
+        ->join('comptes c', 'c.id = transactions.compte_destination_id')
+        ->join('clients cl', 'cl.id = c.client_id')
+        ->join('prefixes p', 'p.id = cl.prefix_id')
+        ->where('p.autre_operateur_id', null)
+        ->first();
+}
+
+public function getGainsInterOperateurs()
+{
+    return $this
+        ->select('ao.nom, SUM(transactions.frais) AS total')
+        ->join('comptes c', 'c.id = transactions.compte_destination_id')
+        ->join('clients cl', 'cl.id = c.client_id')
+        ->join('prefixes p', 'p.id = cl.prefix_id')
+        ->join('autre_operateur ao', 'ao.id = p.autre_operateur_id')
+        ->groupBy('ao.id')
+        ->findAll();
+}
 }
