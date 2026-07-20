@@ -44,6 +44,10 @@
         En continuant, vous acceptez nos<br>
         <strong>Conditions d'utilisation</strong>
       </p>
+
+      <a href="<?= base_url('/operateur/login') ?>">
+                            Connexion entant qu'operateur
+                        </a>
     </div>
   </div>
 </div>

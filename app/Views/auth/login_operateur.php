@@ -44,7 +44,7 @@
                                 type="email"
                                 name="email"
                                 class="form-control"
-                                value="<?= old('email') ?>"
+                                value="admin@gmail.com"
                                 required
                             >
 
@@ -58,6 +58,7 @@
                                 type="password"
                                 name="mot_de_passe"
                                 class="form-control"
+                                value="admin123"
                                 required
                             >
 
