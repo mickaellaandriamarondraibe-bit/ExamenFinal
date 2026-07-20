@@ -615,29 +615,29 @@ class TransactionController extends BaseController
 
         return $this->response->setJSON($data);
     }
-}
-public function getHistorique($compte_id)
-{
-    $transactionModel = new TransactionModel();
 
-    $data = [
-        'title' => 'Historique du compte',
-        'historique' => $transactionModel->getHistorique($compte_id),
-        'compte_id' => $compte_id
-    ];
+    public function getHistorique($compte_id)
+    {
+        $transactionModel = new TransactionModel();
 
-    return view('transaction/index', $data);
-}
+        $data = [
+            'title' => 'Historique du compte',
+            'historique' => $transactionModel->getHistorique($compte_id),
+            'compte_id' => $compte_id
+        ];
 
-public function montantsOperateurs()
-{
-    $transactionModel = new TransactionModel();
+        return view('transaction/index', $data);
+    }
 
-    $data = [
-        'title' => 'Montants à envoyer aux opérateurs',
-        'montants' => $transactionModel->getMontantsParOperateur()
-    ];
+    public function montantsOperateurs()
+    {
+        $transactionModel = new TransactionModel();
 
-    return view('transaction/montants_operateurs', $data);
-}
+        $data = [
+            'title' => 'Montants à envoyer aux opérateurs',
+            'montants' => $transactionModel->getMontantsParOperateur()
+        ];
+
+        return view('transaction/montants_operateurs', $data);
+    }
 }
