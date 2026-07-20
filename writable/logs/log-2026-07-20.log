@@ -386,6 +386,7 @@ in APPPATH/Views/client/index.php on line 62.
 11 FCPATH/index.php(59): CodeIgniter\Boot::bootWeb()
 12 SYSTEMPATH/rewrite.php(44): require_once('/home/mickaella/Projet/2026/s4/nouveau/INF205_Systeme_Information/ExamenFinal/public/index.php')
 DEBUG - 2026-07-20 08:36:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+<<<<<<< HEAD
 =======
 CRITICAL - 2026-07-20 06:58:54 --> Error: Class "App\Models\PrefixModel" not found
 [Method: POST, Route: login]
@@ -408,3 +409,5 @@ in APPPATH/Controllers/ClientController.php on line 26.
 >>>>>>> 1fd19ca (commit : clientController)
 =======
 >>>>>>> d2f8699 (client)
+=======
+>>>>>>> e44b80b (cleint)
