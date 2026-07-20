@@ -3,52 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Mobi Money — Transfert</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
 </head>
+
 <body>
 
 <div class="phone">
+
   <div class="app-header simple">
+
     <a href="<?= site_url('accueil') ?>" class="back-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <polyline points="15 18 9 12 15 6"/>
       </svg>
     </a>
+
     <h1>Transfert</h1>
+
   </div>
 
+
   <div class="app-content">
+
     <?php if (session()->getFlashdata('error')) : ?>
+
       <div class="alert alert-error">
         <?= esc(session()->getFlashdata('error')) ?>
       </div>
+
     <?php endif; ?>
 
+
+    <?php if (session()->getFlashdata('success')) : ?>
+
+      <div class="alert alert-success">
+        <?= esc(session()->getFlashdata('success')) ?>
+      </div>
+
+    <?php endif; ?>
+
+
     <form action="<?= site_url('transfert') ?>" method="post">
+
       <?= csrf_field() ?>
 
+
       <div class="field">
-        <label for="telephone">Numéro destinataire</label>
+
+        <label for="telephone">
+          Numéro destinataire
+        </label>
 
         <div class="input-wrap">
+
           <input
             type="text"
             name="telephone"
             id="telephone"
-            placeholder="Ex : 032 98 765 43"
+            placeholder="Ex : 037 98 765 43"
             value="<?= esc(old('telephone')) ?>"
             required
           >
+
         </div>
+
       </div>
 
+
       <div class="field">
-        <label for="montant">Montant à transférer</label>
+
+        <label for="montant">
+          Montant à transférer
+        </label>
 
         <div class="input-wrap">
+
           <input
             type="number"
             name="montant"
@@ -59,12 +102,19 @@
             required
           >
 
-          <span class="suffix">Ar</span>
+          <span class="suffix">
+            Ar
+          </span>
+
         </div>
+
       </div>
 
+
       <div class="field">
-        <label class="commission-option">
+
+        <label for="prise_en_charge_commission">
+
           <input
             type="checkbox"
             name="prise_en_charge_commission"
@@ -73,196 +123,238 @@
             <?= old('prise_en_charge_commission') ? 'checked' : '' ?>
           >
 
-          <span>
-            Prendre en charge la commission inter-opérateur
-          </span>
+          Prendre en charge la commission
+
         </label>
 
-        <small class="field-help">
-          Si cette option n’est pas cochée, la commission sera retirée du montant reçu par le destinataire.
+        <small>
+          Si cette option n’est pas cochée, la commission sera retirée du montant reçu.
         </small>
+
       </div>
 
-      <div
-        id="message-operateur"
-        class="alert"
-        style="display: none;"
-      ></div>
 
       <div class="card">
-        <div class="detail-row">
-          <span>Frais de transfert</span>
-          <span id="frais">0 Ar</span>
-        </div>
 
         <div class="detail-row">
-          <span>Commission inter-opérateur</span>
-          <span id="commission">0 Ar</span>
+
+          <span>
+            Frais
+          </span>
+
+          <span id="frais">
+            0 Ar
+          </span>
+
         </div>
 
+
         <div class="detail-row">
-          <span>Le destinataire recevra</span>
-          <span id="recevra">0 Ar</span>
+
+          <span>
+            Commission
+          </span>
+
+          <span id="commission">
+            0 Ar
+          </span>
+
         </div>
+
+
+        <div class="detail-row">
+
+          <span>
+            Le destinataire recevra
+          </span>
+
+          <span id="recevra">
+            0 Ar
+          </span>
+
+        </div>
+
 
         <div class="detail-row total">
-          <span>Total débité</span>
-          <span class="val" id="total">0 Ar</span>
+
+          <span>
+            Total débité
+          </span>
+
+          <span class="val" id="total">
+            0 Ar
+          </span>
+
         </div>
+
       </div>
+
 
       <button type="submit" class="btn-primary">
         Confirmer le transfert
       </button>
+
     </form>
+
   </div>
 
+
   <?= view('templates/bottom_nav', ['active' => 'transfert']) ?>
+
 </div>
 
+
 <script>
+
 const montantInput = document.getElementById('montant');
+
 const telephoneInput = document.getElementById('telephone');
+
 const priseEnChargeInput = document.getElementById(
   'prise_en_charge_commission'
 );
 
-const fraisEl = document.getElementById('frais');
-const commissionEl = document.getElementById('commission');
-const recevraEl = document.getElementById('recevra');
-const totalEl = document.getElementById('total');
-const messageOperateurEl = document.getElementById(
-  'message-operateur'
-);
+const fraisElement = document.getElementById('frais');
+
+const commissionElement = document.getElementById('commission');
+
+const recevraElement = document.getElementById('recevra');
+
+const totalElement = document.getElementById('total');
+
 
 let timer;
 
-function formatAr(nombre) {
-  const valeur = Number(nombre) || 0;
 
-  return new Intl.NumberFormat('fr-FR', {
-    maximumFractionDigits: 0
-  }).format(valeur) + ' Ar';
+function formatAr(valeur)
+{
+  return Number(valeur || 0).toLocaleString('fr-FR') + ' Ar';
 }
 
-function nettoyerTelephone(telephone) {
-  return telephone.replace(/\D/g, '');
+
+function remettreAZero()
+{
+  fraisElement.textContent = '0 Ar';
+
+  commissionElement.textContent = '0 Ar';
+
+  recevraElement.textContent = '0 Ar';
+
+  totalElement.textContent = '0 Ar';
 }
 
-function reinitialiserCalcul() {
-  fraisEl.textContent = '0 Ar';
-  commissionEl.textContent = '0 Ar';
-  recevraEl.textContent = '0 Ar';
-  totalEl.textContent = '0 Ar';
 
-  messageOperateurEl.textContent = '';
-  messageOperateurEl.style.display = 'none';
-}
-
-function calculerFrais() {
+function calculerTransfert()
+{
   clearTimeout(timer);
 
-  const montant = parseFloat(montantInput.value) || 0;
-  const telephone = nettoyerTelephone(telephoneInput.value);
+  const montant = Number(montantInput.value);
 
-  const priseEnChargeCommission = priseEnChargeInput.checked
-    ? 1
-    : 0;
+  const telephone = telephoneInput.value.replace(/\D/g, '');
 
-  if (montant <= 0) {
-    reinitialiserCalcul();
+  const priseEnChargeCommission =
+    priseEnChargeInput.checked ? 1 : 0;
+
+
+  if (montant <= 0 || telephone.length < 3)
+  {
+    remettreAZero();
+
     return;
   }
 
-  /*
-   * On attend au moins les trois chiffres du préfixe.
-   * Le backend vérifiera ensuite que le numéro complet est valide.
-   */
-  if (telephone.length < 3) {
-    reinitialiserCalcul();
-    return;
-  }
 
-  timer = setTimeout(() => {
-    const body = new URLSearchParams();
+  timer = setTimeout(function () {
 
-    body.append('montant', montant);
-    body.append('telephone', telephone);
-    body.append('type_operation_id', 3);
-    body.append(
+    const donnees = new URLSearchParams();
+
+    donnees.append('montant', montant);
+
+    donnees.append('telephone', telephone);
+
+    donnees.append(
       'prise_en_charge_commission',
       priseEnChargeCommission
     );
 
-    body.append(
+    donnees.append(
       '<?= csrf_token() ?>',
       '<?= csrf_hash() ?>'
     );
 
+
     fetch('<?= site_url('calculer-frais') ?>', {
+
       method: 'POST',
+
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'X-Requested-With': 'XMLHttpRequest'
+        'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: body.toString()
+
+      body: donnees.toString()
+
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Erreur lors du calcul');
-        }
 
-        return response.json();
-      })
-      .then(data => {
-        if (data.error) {
-          reinitialiserCalcul();
+    .then(function (response) {
 
-          messageOperateurEl.textContent = data.error;
-          messageOperateurEl.className = 'alert alert-error';
-          messageOperateurEl.style.display = 'block';
+      return response.json();
 
-          return;
-        }
+    })
 
-        fraisEl.textContent = formatAr(data.frais);
-        commissionEl.textContent = formatAr(data.commission);
-        recevraEl.textContent = formatAr(data.montant_recu);
-        totalEl.textContent = formatAr(data.total);
+    .then(function (data) {
 
-        if (data.autre_operateur) {
-          messageOperateurEl.textContent =
-            'Transfert vers ' +
-            data.nom_operateur +
-            ' — commission : ' +
-            data.pourcentage_commission +
-            ' %';
+      if (data.error)
+      {
+        remettreAZero();
 
-          messageOperateurEl.className = 'alert';
-          messageOperateurEl.style.display = 'block';
-        } else {
-          messageOperateurEl.textContent =
-            'Transfert vers un numéro de notre opérateur';
+        return;
+      }
 
-          messageOperateurEl.className = 'alert';
-          messageOperateurEl.style.display = 'block';
-        }
-      })
-      .catch(() => {
-        reinitialiserCalcul();
 
-        messageOperateurEl.textContent =
-          'Impossible de calculer les frais actuellement';
+      fraisElement.textContent =
+        formatAr(data.frais);
 
-        messageOperateurEl.className = 'alert alert-error';
-        messageOperateurEl.style.display = 'block';
-      });
+
+      commissionElement.textContent =
+        formatAr(data.commission);
+
+
+      recevraElement.textContent =
+        formatAr(data.montant_recu);
+
+
+      totalElement.textContent =
+        formatAr(data.total);
+
+    })
+
+    .catch(function () {
+
+      remettreAZero();
+
+    });
+
   }, 400);
 }
 
-montantInput.addEventListener('input', calculerFrais);
-telephoneInput.addEventListener('input', calculerFrais);
-priseEnChargeInput.addEventListener('change', calculerFrais);
+
+montantInput.addEventListener(
+  'input',
+  calculerTransfert
+);
+
+
+telephoneInput.addEventListener(
+  'input',
+  calculerTransfert
+);
+
+
+priseEnChargeInput.addEventListener(
+  'change',
+  calculerTransfert
+);
+
 </script>
 
 </body>

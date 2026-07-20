@@ -250,15 +250,6 @@ public function enregistrerTransfert()
             ->with('error', 'Destinataire introuvable');
     }
 
-    if ((int) $compteSource['id'] === (int) $compteDestination['id']) {
-        return redirect()->back()
-            ->withInput()
-            ->with(
-                'error',
-                'Vous ne pouvez pas transférer vers votre propre compte'
-            );
-    }
-
     $typeOperationId = 3; // TRANSFERT
 
     // Recherche des frais selon le montant et l’opérateur
