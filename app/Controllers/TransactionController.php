@@ -9,9 +9,9 @@ use App\Models\BaremeFraisModel;
 
 class TransactionController extends BaseController
 {
-    // ==========================================
+
     // DEPOT
-    // ==========================================
+
 
     public function faireDepot()
     {
@@ -63,7 +63,7 @@ class TransactionController extends BaseController
                     ->with('error', "Erreur lors de l'enregistrement de la transaction");
             }
 
-            // Créditer le compte
+            
             $nouveauSolde = $compte['solde'] + $montant;
             $compteModel->update($compte['id'], ['solde' => $nouveauSolde]);
 
@@ -74,9 +74,9 @@ class TransactionController extends BaseController
         return view('transaction/depot');
     }
 
-    // ==========================================
+ 
     // RETRAIT
-    // ==========================================
+
 
     public function faireRetrait()
     {
@@ -148,9 +148,9 @@ class TransactionController extends BaseController
         return view('transaction/retrait');
     }
 
-    // ==========================================
+
     // TRANSFERT
-    // ==========================================
+
 
     public function faireTransfert()
     {
@@ -186,7 +186,7 @@ class TransactionController extends BaseController
                     ->with('error', 'Numéro du destinataire invalide');
             }
 
-            // Compte source (celui qui envoie)
+            // Compte source 
             $compteSource = $compteModel->getCompteByClientId($client_id);
 
             if (!$compteSource) {
@@ -194,7 +194,7 @@ class TransactionController extends BaseController
                     ->with('error', 'Compte introuvable');
             }
 
-            // Compte destination (via le numéro de téléphone du destinataire)
+            // Compte destination 
             $compteDestination = $compteModel->getCompteByTelephone($telephoneDestinataire);
 
             if (!$compteDestination) {
@@ -203,7 +203,7 @@ class TransactionController extends BaseController
                     ->with('error', 'Destinataire introuvable');
             }
 
-            // Empêcher de se transférer à soi-même
+           
             if ($compteSource['id'] === $compteDestination['id']) {
                 return redirect()->back()
                     ->withInput()
@@ -254,9 +254,9 @@ class TransactionController extends BaseController
     }
 
 
-    // ==========================================
+
     // HISTORIQUE
-    // ==========================================
+
 
     public function historique()
     {

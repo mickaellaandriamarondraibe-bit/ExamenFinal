@@ -52,4 +52,15 @@ class CompteModel extends Model
 
         return $numero;
     }
+
+ 
+
+
+    public function getCompteByTelephone($telephone)
+    {
+        return $this->select('comptes.*')
+                    ->join('clients', 'clients.id = comptes.client_id')
+                    ->where('clients.telephone', $telephone)
+                    ->first();
+    }
 }
