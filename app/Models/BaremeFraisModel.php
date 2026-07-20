@@ -22,13 +22,8 @@ class BaremeFraisModel extends Model
     public function getAllWithTypeOperation()
     {
         return $this
-            ->select(
-                'baremes_frais.*, types_operations.libelle AS type_operation'
-            )
-            ->join(
-                'types_operations',
-                'types_operations.id = baremes_frais.type_operation_id'
-            )
+            ->select('baremes_frais.*, types_operations.libelle AS type_operation')
+            ->join('types_operations', 'types_operations.id = baremes_frais.type_operation_id')
             ->orderBy('types_operations.libelle', 'ASC')
             ->orderBy('baremes_frais.montant_min', 'ASC')
             ->findAll();
@@ -37,14 +32,17 @@ class BaremeFraisModel extends Model
     public function findWithTypeOperation($id)
     {
         return $this
-            ->select(
-                'baremes_frais.*, types_operations.libelle AS type_operation'
-            )
-            ->join(
-                'types_operations',
-                'types_operations.id = baremes_frais.type_operation_id'
-            )
+            ->select('baremes_frais.*, types_operations.libelle AS type_operation')
+            ->join('types_operations', 'types_operations.id = baremes_frais.type_operation_id')
             ->where('baremes_frais.id', $id)
             ->first();
+    }
+
+    public function getFraisByMontant($typeOperationId, $montant)
+    {
+        return $this->where('type_operation_id', $typeOperationId)
+                    ->where('montant_min <=', $montant)
+                    ->where('montant_max >=', $montant)
+                    ->first();
     }
 }

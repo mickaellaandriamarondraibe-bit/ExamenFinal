@@ -3,26 +3,31 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
-use App\Models\ClientModel;
 
 class CompteModel extends Model
 {
-    protected $table = 'comptes';
-
-    protected $primaryKey = 'id';
-
+    protected $table         = 'comptes';
+    protected $primaryKey    = 'id';
+    protected $returnType    = 'array';
     protected $allowedFields = [
         'client_id',
         'numero_compte',
         'solde',
-        'actif'
+        'statut',
     ];
 
     public function getAllWithClient()
     {
         return $this
-            ->select('comptes.*')
+            ->select('comptes.*, clients.telephone')
             ->join('clients', 'clients.id = comptes.client_id')
             ->findAll();
     }
+
+    public function getCompteByClientId($client_id)
+    {
+        return $this->where('client_id', $client_id)->first();
+    }
+
+    
 }
