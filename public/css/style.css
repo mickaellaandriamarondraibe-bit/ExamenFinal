@@ -152,6 +152,239 @@ h1, h2, h3, .brand { font-family: 'Poppins', sans-serif; }
   color: var(--green-dark);
 }
 
+/* ===== Accueil client ===== */
+.home-header {
+  background: linear-gradient(135deg, #123D2E, #0F5C3D);
+  color: var(--white);
+  padding: 17px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.home-user span {
+  display: block;
+  font-size: 11px;
+  opacity: 0.78;
+  margin-bottom: 3px;
+}
+
+.home-user strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.home-bell {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.14);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.home-content {
+  padding-top: 16px;
+}
+
+.home-balance-card {
+  background: #F7FBF3;
+  border: 1px solid #DDEBD4;
+  border-radius: 16px;
+  padding: 18px;
+  margin: 0 0 18px;
+  box-shadow: 0 12px 24px rgba(18, 61, 46, 0.08);
+}
+
+.home-balance-top,
+.home-balance-footer,
+.home-panel-head,
+.home-last-operation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.home-balance-top {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.status-pill {
+  background: #FFE8B7;
+  color: #6C4A00;
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.home-balance-amount {
+  color: var(--green-dark);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.home-balance-footer {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 14px;
+}
+
+.home-section-title {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.home-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.home-action {
+  min-height: 82px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--text);
+  text-decoration: none;
+  padding: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+}
+
+.home-action strong,
+.home-last-operation strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.home-action small,
+.home-last-operation small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.home-action-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--green-light);
+  color: var(--green-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.home-action-icon.yellow {
+  background: #FFF2CF;
+  color: #7A5300;
+}
+
+.home-action-icon.blue {
+  background: #E7F0FF;
+  color: #174A7C;
+}
+
+.home-action-icon.red {
+  background: #FCE9E9;
+  color: var(--red);
+}
+
+.home-panel {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 15px;
+  margin-bottom: 12px;
+  background: var(--white);
+}
+
+.home-panel-head {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.home-panel-head a {
+  color: var(--green);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.home-empty {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 8px 0;
+}
+
+.home-last-operation {
+  gap: 10px;
+}
+
+.home-last-operation div {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-last-operation b {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.amount-in {
+  color: var(--green-dark);
+}
+
+.amount-out {
+  color: var(--red);
+}
+
+.home-history-link {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--text);
+  text-decoration: none;
+  padding: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 700;
+  background: #FBFAF7;
+}
+
+.home-history-link > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-history-link .icon-circle {
+  width: 38px;
+  height: 38px;
+  background: var(--green-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green-dark);
+}
+
 /* ===== Formulaires ===== */
 .field { margin-bottom: 16px; }
 .field label {
