@@ -11,6 +11,7 @@ class BaremeFraisModel extends Model
 
     protected $allowedFields = [
         'type_operation_id',
+        'autre_operateur_id',
         'montant_min',
         'montant_max',
         'frais'
@@ -38,11 +39,22 @@ class BaremeFraisModel extends Model
             ->first();
     }
 
-    public function getFraisByMontant($typeOperationId, $montant)
-    {
-        return $this->where('type_operation_id', $typeOperationId)
-                    ->where('montant_min <=', $montant)
-                    ->where('montant_max >=', $montant)
-                    ->first();
+     public function getFraisByMontant(
+        $typeOperationId,
+        $montant,
+        $autreOperateurId = null
+    ) {
+        $builder = $this
+            ->where('type_operation_id', $typeOperationId)
+            ->where('montant_min <=', $montant)
+            ->where('montant_max >=', $montant);
+
+        if ($autreOperateurId === null) {
+            $builder->where('autre_operateur_id', null);
+        } else {
+            $builder->where('autre_operateur_id', $autreOperateurId);
+        }
+
+        return $builder->first();
     }
 }
