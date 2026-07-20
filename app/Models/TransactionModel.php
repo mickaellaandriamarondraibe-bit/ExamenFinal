@@ -15,7 +15,7 @@ class TransactionModel extends Model
     protected $allowedFields    = ['type_operation_id','compte_source_id','compte_destination_id','montant','frais','statut','date_transaction'];
 
     
-    public function enregistrerDepot($compte_destination_id, $type_operation_id,$montant,$frais,$dateTransaction){
+    public function enregistrerDepot($compte_destination_id, $type_operation_id,$montant,$frais){
 
          return $this->insert([
             'type_operation_id'      => $type_operation_id,
@@ -28,7 +28,7 @@ class TransactionModel extends Model
         ]);
     }
 
-    public function enregistrerRetrait($compte_source_id, $type_operation_id,$montant,$frais,$dateTransaction){
+    public function enregistrerRetrait($compte_source_id, $type_operation_id,$montant,$frais){
 
          return $this->insert([
             'type_operation_id'      => $type_operation_id,
@@ -42,7 +42,7 @@ class TransactionModel extends Model
     }
 
 
-    public function enregistrerTransfert($compte_source_id, $compte_destination_id, $type_operation_id,$montant,$frais,$dateTransaction){
+    public function enregistrerTransfert($compte_source_id, $compte_destination_id, $type_operation_id,$montant,$frais){
 
          return $this->insert([
             'type_operation_id'      => $type_operation_id,
