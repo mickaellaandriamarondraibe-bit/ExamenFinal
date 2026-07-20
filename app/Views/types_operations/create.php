@@ -55,7 +55,7 @@
                         <div class="d-flex justify-content-end gap-2">
 
                             <a
-                                href="<?= base_url('types-operations') ?>"
+                                href="<?= base_url('operateur/types-operations') ?>"
                                 class="btn btn-light"
                             >
                                 Annuler

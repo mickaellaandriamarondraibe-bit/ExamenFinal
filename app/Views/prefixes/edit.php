@@ -6,7 +6,9 @@
 
 <h3>Modifier un préfixe</h3>
 
-<form action="<?= base_url('prefixes/update/'.$prefix['id']) ?>" method="post">
+<form action="<?= base_url('operateur/prefixes/update/'.$prefix['id']) ?>" method="post">
+
+<?= csrf_field() ?>
 
 <div class="mb-3">
 
@@ -16,7 +18,7 @@
 type="text"
 name="prefixe"
 class="form-control"
-value="<?= $prefix['prefixe'] ?>"
+value="<?= esc($prefix['prefixe']) ?>"
 required>
 
 </div>
@@ -27,9 +29,9 @@ required>
 
 <select name="actif" class="form-select">
 
-<option value="1" <?= $prefix['actif'] ? 'selected' : '' ?>>Actif</option>
+<option value="1" <?= $prefix['actif'] == 1 ? 'selected' : '' ?>>Actif</option>
 
-<option value="0" <?= !$prefix['actif'] ? 'selected' : '' ?>>Inactif</option>
+<option value="0" <?= $prefix['actif'] == 0 ? 'selected' : '' ?>>Inactif</option>
 
 </select>
 
@@ -39,7 +41,7 @@ required>
 Modifier
 </button>
 
-<a href="<?= base_url('prefixes') ?>" class="btn btn-secondary">
+<a href="<?= base_url('operateur/prefixes') ?>" class="btn btn-secondary">
 Annuler
 </a>
 

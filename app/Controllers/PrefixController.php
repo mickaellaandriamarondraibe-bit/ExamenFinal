@@ -37,7 +37,7 @@ class PrefixController extends BaseController
             'actif'   => $this->request->getPost('actif')
         ]);
 
-        return redirect()->to('/prefixes');
+        return redirect()->to('/operateur/prefixes');
     }
 
     public function edit($id)
@@ -57,14 +57,14 @@ class PrefixController extends BaseController
             'actif'   => $this->request->getPost('actif')
         ]);
 
-        return redirect()->to('/prefixes');
+        return redirect()->to('/operateur/prefixes');
     }
 
     public function delete($id)
     {
         $this->prefixModel->delete($id);
 
-        return redirect()->to('/prefixes');
+        return redirect()->to('/operateur/prefixes');
     }
 
     public function findBylibelle($libelle)

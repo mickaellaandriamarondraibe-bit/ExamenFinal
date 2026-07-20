@@ -86,4 +86,6 @@ class ClientController extends BaseController
 
             return view('client/index', $data);
     }
+
+    
 }

@@ -2,59 +2,99 @@
 
 <?= $this->section('content') ?>
 
-<h2 class="mb-3">Ajouter un compte</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Comptes clients</h2>
 
-<form action="<?= base_url('compte/store') ?>" method="post">
 
-    <?= csrf_field() ?>
+</div>
 
-    <div class="mb-3">
-        <label class="form-label">Client</label>
+<div class="table-responsive">
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Numéro de compte</th>
+                <th>Solde</th>
+                <th>État</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
 
-        <select name="client_id" class="form-select" required>
-            <option value="">Choisir un client</option>
+        <tbody>
+            <?php if (!empty($comptes)): ?>
 
-            <?php foreach ($clients as $client): ?>
-                <option value="<?= $client['id'] ?>">
-                    <?= esc($client['telephone']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
+                <?php foreach ($comptes as $compte): ?>
+                    <tr>
+                        <td><?= esc($compte['id']) ?></td>
 
-    <div class="mb-3">
-        <label class="form-label">Numéro de compte</label>
+                        <td>
+                            <?= esc($compte['numero_compte']) ?>
+                        </td>
 
-        <input
-            type="text"
-            name="numero_compte"
-            class="form-control"
-            placeholder="Exemple : 0331234567"
-            required
-        >
-    </div>
+                        <td>
+                            <?= number_format(
+                                $compte['solde'],
+                                0,
+                                ',',
+                                ' '
+                            ) ?> Ar
+                        </td>
 
-    <div class="mb-3">
-        <label class="form-label">Solde</label>
+                        <td>
+                            <?php if ($compte['actif'] == 1): ?>
+                                <span class="badge bg-success">
+                                    Actif
+                                </span>
+                            <?php else: ?>
+                                <span class="badge bg-secondary">
+                                    Inactif
+                                </span>
+                            <?php endif; ?>
+                        </td>
 
-        <input
-            type="number"
-            name="solde"
-            class="form-control"
-            value="0"
-            min="0"
-            required
-        >
-    </div>
+                        <td>
+                            <a
+                                href="<?= base_url(
+                                    'compte/historique/' . $compte['id']
+                                ) ?>"
+                                class="btn btn-info btn-sm"
+                            >
+                                Voir
+                            </a>
 
-    <button type="submit" class="btn btn-primary">
-        Enregistrer
-    </button>
+                            <a
+                                href="<?= base_url(
+                                    'compte/edit/' . $compte['id']
+                                ) ?>"
+                                class="btn btn-warning btn-sm"
+                            >
+                                Modifier
+                            </a>
 
-    <a href="<?= base_url('compte') ?>" class="btn btn-secondary">
-        Annuler
-    </a>
+                            <a
+                                href="<?= base_url(
+                                    'compte/delete/' . $compte['id']
+                                ) ?>"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Supprimer ce compte ?')"
+                            >
+                                Supprimer
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
 
-</form>
+            <?php else: ?>
+
+                <tr>
+                    <td colspan="5" class="text-center">
+                        Aucun compte trouvé.
+                    </td>
+                </tr>
+
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
 <?= $this->endSection() ?>

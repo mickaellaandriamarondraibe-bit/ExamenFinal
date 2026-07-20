@@ -15,7 +15,7 @@
         </div>
 
         <a
-            href="<?= base_url('types-operations/create') ?>"
+            href="<?= base_url('operateur/types-operations/create') ?>"
             class="btn btn-primary"
         >
             <i class="bi bi-plus-lg"></i>
@@ -96,7 +96,7 @@
 
                                         <a
                                             href="<?= base_url(
-                                                'types-operations/edit/' .
+                                                'operateur/types-operations/edit/' .
                                                 $type['id']
                                             ) ?>"
                                             class="btn btn-warning btn-sm"

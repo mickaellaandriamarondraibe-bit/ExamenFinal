@@ -13,6 +13,19 @@ class TransactionController extends BaseController
     // DEPOT
     // ==========================================
 
+    public function index()
+    {
+        $transactionModel = new TransactionModel();
+
+        $data = [
+            'title' => 'Liste des transactions',
+            'transactions' => $transactionModel
+                ->orderBy('date_transaction', 'DESC')
+                ->findAll()
+        ];
+
+        return view('transaction/all', $data);
+    }
     public function faireDepot()
     {
         return view('transaction/depot');
@@ -252,4 +265,18 @@ class TransactionController extends BaseController
 
         return view('transaction/transfert');
     }
+
+
+public function getHistorique($compte_id)
+{
+    $transactionModel = new TransactionModel();
+
+    $data = [
+        'title' => 'Historique du compte',
+        'historique' => $transactionModel->getHistorique($compte_id),
+        'compte_id' => $compte_id
+    ];
+
+    return view('transaction/index', $data);
+}
 }
