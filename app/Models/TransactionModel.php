@@ -93,26 +93,53 @@ class TransactionModel extends Model
                 ->findAll();
 }
 
-public function getGainsInternes()
-{
-    return $this
-        ->selectSum('transactions.frais', 'total')
-        ->join('comptes c', 'c.id = transactions.compte_destination_id')
-        ->join('clients cl', 'cl.id = c.client_id')
-        ->join('prefixes p', 'p.id = cl.prefix_id')
-        ->where('p.autre_operateur_id', null)
-        ->first();
-}
+ public function getGainsInternes()
+    {
+        return $this
+            ->select('SUM(frais) AS total')
+            ->where('autre_operateur_id', null)
+            ->first();
+    }
 
-public function getGainsInterOperateurs()
-{
-    return $this
-        ->select('ao.nom, SUM(transactions.frais) AS total')
-        ->join('comptes c', 'c.id = transactions.compte_destination_id')
-        ->join('clients cl', 'cl.id = c.client_id')
-        ->join('prefixes p', 'p.id = cl.prefix_id')
-        ->join('autre_operateur ao', 'ao.id = p.autre_operateur_id')
-        ->groupBy('ao.id')
-        ->findAll();
-}
+    /**
+     * Gains des transactions inter-opérateurs
+     * groupés par opérateur
+     */
+    public function getGainsInterOperateurs()
+    {
+        return $this
+            ->select('
+                autre_operateur.id,
+                autre_operateur.nom,
+                SUM(transactions.frais) AS total_frais,
+                SUM(transactions.commission) AS total_commission,
+                SUM(transactions.frais + transactions.commission) AS gain_total
+            ')
+            ->join(
+                'autre_operateur',
+                'autre_operateur.id = transactions.autre_operateur_id'
+            )
+            ->where('transactions.autre_operateur_id IS NOT NULL')
+            ->groupBy('autre_operateur.id')
+            ->findAll();
+    }
+
+
+    public function getMontantsParOperateur()
+    {
+        return $this
+            ->select('
+                autre_operateur.id,
+                autre_operateur.nom,
+                SUM(transactions.montant_recu) AS montant_total
+            ')
+            ->join(
+                'autre_operateur',
+                'autre_operateur.id = transactions.autre_operateur_id'
+            )
+            ->where('transactions.autre_operateur_id IS NOT NULL')
+            ->where('transactions.statut', 'SUCCES')
+            ->groupBy('autre_operateur.id')
+            ->findAll();
+    }
 }

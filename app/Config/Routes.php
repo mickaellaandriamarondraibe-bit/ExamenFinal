@@ -72,7 +72,11 @@ $routes->group('operateur', ['filter' => 'auth:operateur'], function ($routes) {
     $routes->post('autres_operateurs/update/(:num)', 'AutreOperateurController::update/$1');
     $routes->get('autres_operateurs/delete/(:num)', 'AutreOperateurController::delete/$1');
 
-    /* CRUD bareme */
+    $routes->get(
+    'montants-operateurs',
+    'TransactionController::montantsOperateurs'
+    );
+        /* CRUD bareme */
     $routes->get('baremes-frais', 'BaremeFraisController::index');
     $routes->get('baremes-frais/create', 'BaremeFraisController::create');
     $routes->post('baremes-frais/store', 'BaremeFraisController::store');

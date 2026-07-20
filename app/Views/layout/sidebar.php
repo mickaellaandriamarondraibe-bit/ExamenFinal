@@ -43,6 +43,11 @@
             <i class="bi bi-graph-up"></i>
             <span>Situation des gains</span>
         </a>
+
+        <a href="<?= base_url('operateur/montants-operateurs') ?>" class="sidebar-link">
+            <i class="bi bi-send"></i>
+            <span>Montants à envoyer</span>
+        </a>
     </nav>
 
     <div class="sidebar-logout">

@@ -2,13 +2,11 @@
 
 namespace App\Controllers;
 
-use App\Models\GainModel;
+use App\Models\TransactionModel;
 
 class GainController extends BaseController
 {
-   
-
-     public function index()
+    public function index()
     {
         $transactionModel = new TransactionModel();
 
@@ -21,5 +19,3 @@ class GainController extends BaseController
         return view('gains/index', $data);
     }
 }
-
-

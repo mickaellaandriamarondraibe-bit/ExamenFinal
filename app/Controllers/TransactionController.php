@@ -503,4 +503,16 @@ public function getHistorique($compte_id)
 
     return view('transaction/index', $data);
 }
+
+public function montantsOperateurs()
+{
+    $transactionModel = new TransactionModel();
+
+    $data = [
+        'title' => 'Montants à envoyer aux opérateurs',
+        'montants' => $transactionModel->getMontantsParOperateur()
+    ];
+
+    return view('transaction/montants_operateurs', $data);
+}
 }

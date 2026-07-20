@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\BaremeFraisModel;
 use App\Models\TypeOperationModel;
+use App\Models\AutreOperateurModel;
 
 class BaremeFraisController extends BaseController
 {
@@ -22,56 +23,77 @@ class BaremeFraisController extends BaseController
     public function create()
     {
         $typeModel = new TypeOperationModel();
+        $operateurModel = new AutreOperateurModel();
 
         $data = [
             'title' => 'Ajouter un barème',
-            'types' => $typeModel->findAll()
+            'types' => $typeModel->findAll(),
+            'operateurs' => $operateurModel->findAll()
         ];
 
         return view('baremes_frais/create', $data);
     }
 
     public function store()
-    {
-        $model = new BaremeFraisModel();
+{
+    $model = new BaremeFraisModel();
 
-        $model->insert([
-            'type_operation_id' => $this->request->getPost('type_operation_id'),
-            'montant_min' => $this->request->getPost('montant_min'),
-            'montant_max' => $this->request->getPost('montant_max'),
-            'frais' => $this->request->getPost('frais')
-        ]);
+    $autreOperateurId = $this->request->getPost('autre_operateur_id');
 
-        return redirect()->to('/operateur/baremes-frais');
-    }
+    $model->insert([
+        'type_operation_id' => $this->request->getPost('type_operation_id'),
+
+        'autre_operateur_id' => 
+            $autreOperateurId == '' ? null : $autreOperateurId,
+
+        'montant_min' => $this->request->getPost('montant_min'),
+
+        'montant_max' => $this->request->getPost('montant_max'),
+
+        'frais' => $this->request->getPost('frais')
+    ]);
+
+    return redirect()->to('/operateur/baremes-frais');
+}
 
     public function edit($id)
-    {
-        $model = new BaremeFraisModel();
-        $typeModel = new TypeOperationModel();
+{
+    $model = new BaremeFraisModel();
+    $typeModel = new TypeOperationModel();
+    $operateurModel = new AutreOperateurModel();
 
-        $data = [
-            'title' => 'Modifier un barème',
-            'bareme' => $model->find($id),
-            'types' => $typeModel->findAll()
-        ];
+    $data = [
+        'title' => 'Modifier un barème',
+        'bareme' => $model->find($id),
+        'types' => $typeModel->findAll(),
+        'operateurs' => $operateurModel->findAll()
+    ];
 
-        return view('baremes_frais/edit', $data);
-    }
+    return view('baremes_frais/edit', $data);
+}
 
     public function update($id)
-    {
-        $model = new BaremeFraisModel();
+{
+    $model = new BaremeFraisModel();
 
-        $model->update($id, [
-            'type_operation_id' => $this->request->getPost('type_operation_id'),
-            'montant_min' => $this->request->getPost('montant_min'),
-            'montant_max' => $this->request->getPost('montant_max'),
-            'frais' => $this->request->getPost('frais')
-        ]);
+    $autreOperateurId = $this->request->getPost('autre_operateur_id');
 
-        return redirect()->to('/operateur/baremes-frais');
-    }
+    $model->update($id, [
+
+        'type_operation_id' => $this->request->getPost('type_operation_id'),
+
+        'autre_operateur_id' =>
+            $autreOperateurId == '' ? null : $autreOperateurId,
+
+        'montant_min' => $this->request->getPost('montant_min'),
+
+        'montant_max' => $this->request->getPost('montant_max'),
+
+        'frais' => $this->request->getPost('frais')
+    ]);
+
+    return redirect()->to('/operateur/baremes-frais');
+}
 
     public function delete($id)
     {

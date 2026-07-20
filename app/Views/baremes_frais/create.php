@@ -2,52 +2,177 @@
 
 <?= $this->section('content') ?>
 
-<h2>Ajouter un barème</h2>
+<div class="container-fluid">
 
-<form action="<?= base_url('operateur/baremes-frais/store') ?>" method="post">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Ajouter un barème</h2>
+    </div>
 
-    <?= csrf_field() ?>
 
-    <div class="mb-3">
-        <label class="form-label">Type d'opération</label>
+    <form action="<?= base_url('operateur/baremes-frais/store') ?>" method="post">
 
-        <select name="type_operation_id" class="form-select" required>
-            <option value="">Choisir</option>
+        <?= csrf_field() ?>
 
-            <?php foreach ($types as $type): ?>
-                <option value="<?= $type['id'] ?>">
-                    <?= esc($type['libelle']) ?>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Type d'opération
+            </label>
+
+
+            <select 
+                name="type_operation_id" 
+                class="form-select" 
+                required
+            >
+
+                <option value="">
+                    Choisir
                 </option>
-            <?php endforeach; ?>
-        </select>
-    </div>
 
-    <div class="mb-3">
-        <label class="form-label">Montant minimum</label>
 
-        <input type="number" name="montant_min" class="form-control" required>
-    </div>
+                <?php foreach ($types as $type): ?>
 
-    <div class="mb-3">
-        <label class="form-label">Montant maximum</label>
+                    <option value="<?= $type['id'] ?>">
+                        <?= esc($type['libelle']) ?>
+                    </option>
 
-        <input type="number" name="montant_max" class="form-control" required>
-    </div>
+                <?php endforeach; ?>
 
-    <div class="mb-3">
-        <label class="form-label">Frais</label>
 
-        <input type="number" name="frais" class="form-control" required>
-    </div>
+            </select>
 
-    <button type="submit" class="btn btn-primary">
-        Enregistrer
-    </button>
+        </div>
 
-    <a href="<?= base_url('operateur/baremes-frais') ?>" class="btn btn-secondary">
-        Annuler
-    </a>
 
-</form>
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Opérateur concerné
+            </label>
+
+
+            <select 
+                name="autre_operateur_id" 
+                class="form-select"
+            >
+
+                <option value="">
+                    Notre opérateur (Interne)
+                </option>
+
+
+                <?php foreach ($operateurs as $operateur): ?>
+
+                    <option value="<?= $operateur['id'] ?>">
+
+                        <?= esc($operateur['nom']) ?>
+
+                    </option>
+
+                <?php endforeach; ?>
+
+
+            </select>
+
+
+            <small class="text-muted">
+                Laisser vide pour un barème interne.
+            </small>
+
+        </div>
+
+
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Montant minimum
+            </label>
+
+
+            <input 
+                type="number" 
+                name="montant_min" 
+                class="form-control"
+                min="0"
+                required
+            >
+
+        </div>
+
+
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Montant maximum
+            </label>
+
+
+            <input 
+                type="number" 
+                name="montant_max" 
+                class="form-control"
+                min="0"
+                required
+            >
+
+        </div>
+
+
+
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Frais
+            </label>
+
+
+            <input 
+                type="number" 
+                name="frais" 
+                class="form-control"
+                min="0"
+                required
+            >
+
+        </div>
+
+
+
+
+        <div class="d-flex gap-2">
+
+            <button type="submit" class="btn btn-primary">
+
+                <i class="bi bi-check-lg"></i>
+                Enregistrer
+
+            </button>
+
+
+            <a 
+                href="<?= base_url('operateur/baremes-frais') ?>" 
+                class="btn btn-secondary"
+            >
+
+                Annuler
+
+            </a>
+
+        </div>
+
+
+    </form>
+
+
+</div>
+
 
 <?= $this->endSection() ?>
