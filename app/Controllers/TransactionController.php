@@ -435,32 +435,115 @@ public function enregistrerTransfert()
     }
 
 
+public function calculerFrais()
+{
+    $baremeFraisModel = new \App\Models\BaremeFraisModel();
+    $prefixModel = new \App\Models\PrefixModel();
+    $commissionModel = new \App\Models\CommissionInterOperateurModel();
 
-    public function calculerFrais()
-    {
-        $baremeFraisModel = new BaremeFraisModel();
+    $montant = (float) $this->request->getPost('montant');
 
-        $montant = (float) $this->request->getPost('montant');
-        $type_operation_id = (int) $this->request->getPost('type_operation_id');
+    $telephone = preg_replace(
+        '/\D/',
+        '',
+        (string) $this->request->getPost('telephone')
+    );
 
-        if ($montant <= 0) {
-            return $this->response->setJSON([
-                'frais' => 0,
-                'total' => 0,
-            ]);
-        }
+    $typeOperationId = (int) $this->request->getPost(
+        'type_operation_id'
+    );
 
-        $bareme = $baremeFraisModel->getFraisByMontant($type_operation_id, $montant);
-        $frais = $bareme ? (float) $bareme['frais'] : 0;
+    $priseEnChargeCommission =
+        $this->request->getPost('prise_en_charge_commission') ? 1 : 0;
 
+    if ($montant <= 0) {
         return $this->response->setJSON([
-            'frais'    => $frais,
-            'montant'  => $montant,
-            'total'    => $montant + $frais,   // pour retrait/transfert (débit)
-            'recevra'  => $montant,            // ce que le destinataire/le client reçoit
+            'error' => 'Montant invalide'
         ]);
     }
 
+    if (strlen($telephone) < 3) {
+        return $this->response->setJSON([
+            'error' => 'Numéro invalide'
+        ]);
+    }
+
+    $prefixe = substr($telephone, 0, 3);
+
+    $prefixData = $prefixModel
+        ->where('prefixe', $prefixe)
+        ->where('actif', 1)
+        ->first();
+
+    if (!$prefixData) {
+        return $this->response->setJSON([
+            'error' => 'Préfixe invalide'
+        ]);
+    }
+
+    $autreOperateurId = !empty(
+        $prefixData['autre_operateur_id']
+    )
+        ? (int) $prefixData['autre_operateur_id']
+        : null;
+
+    $baremeQuery = $baremeFraisModel
+        ->where('type_operation_id', $typeOperationId)
+        ->where('montant_min <=', $montant)
+        ->where('montant_max >=', $montant);
+
+    if ($autreOperateurId === null) {
+        $baremeQuery->where('autre_operateur_id', null);
+    } else {
+        $baremeQuery->where(
+            'autre_operateur_id',
+            $autreOperateurId
+        );
+    }
+
+    $bareme = $baremeQuery->first();
+
+    if (!$bareme) {
+        return $this->response->setJSON([
+            'error' => 'Aucun barème trouvé'
+        ]);
+    }
+
+    $frais = (float) $bareme['frais'];
+    $commission = 0;
+
+    if ($autreOperateurId !== null) {
+        $commissionData = $commissionModel
+            ->where(
+                'autre_operateur_id',
+                $autreOperateurId
+            )
+            ->first();
+
+        if ($commissionData) {
+            $pourcentage = (float) $commissionData['pourcentage'];
+
+            $commission = round(
+                $montant * $pourcentage / 100
+            );
+        }
+    }
+
+    if ($priseEnChargeCommission === 1) {
+        $montantRecu = $montant;
+        $totalADebiter = $montant + $frais + $commission;
+    } else {
+        $montantRecu = $montant - $commission;
+        $totalADebiter = $montant + $frais;
+    }
+
+    return $this->response->setJSON([
+        'frais'        => $frais,
+        'commission'   => $commission,
+        'montant_recu' => $montantRecu,
+        'total'        => $totalADebiter
+    ]);
+}
     public function historique2($id)
 {
     $transactionModel = new TransactionModel();

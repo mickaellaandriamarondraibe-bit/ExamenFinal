@@ -271,7 +271,7 @@ function calculerTransfert()
     donnees.append('montant', montant);
 
     donnees.append('telephone', telephone);
-
+    donnees.append('type_operation_id', 3);
     donnees.append(
       'prise_en_charge_commission',
       priseEnChargeCommission
