@@ -193,7 +193,7 @@
       <button type="submit" class="btn-primary">
         Confirmer le transfert
       </button>
-      <a href="<?= site_url('client/transfert-multiple') ?>" class="btn-secondary">
+      <a href="<?= site_url('transfert-multiple') ?>" class="btn-secondary">
   Transfert multiple
 </a>
 
