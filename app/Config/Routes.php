@@ -30,9 +30,12 @@ $routes->get('solde', 'ClientController::solde');
 $routes->get('historique', 'TransactionController::historique');
 
 
+
 $routes->post('calculer-frais', 'TransactionController::calculerFrais');
 $routes->get('operateur/login', 'OperateurController::loginPage');
 $routes->post('operateur/login', 'OperateurController::login');
+$routes->get('transfert-multiple', 'TransactionController::transfertMultiple');
+$routes->post('transfert-multiple', 'TransactionController::enregistrerTransfertMultiple');
 
 $routes->get('logout', 'OperateurController::logout');
 

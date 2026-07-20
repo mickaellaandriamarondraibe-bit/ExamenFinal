@@ -81,6 +81,32 @@ class TransactionModel extends Model
         ]);
     }
 
+    public function enregistrerTransfertMultiple(
+        $compte_source_id,
+        $compte_destination_id,
+        $type_operation_id,
+        $montant,
+        $montant_recu,
+        $frais,
+        $commission,
+        $prise_en_charge_commission,
+        $autre_operateur_id = null
+    ) {
+        return $this->insert([
+            'type_operation_id'          => $type_operation_id,
+            'compte_source_id'           => $compte_source_id,
+            'compte_destination_id'      => $compte_destination_id,
+            'montant'                    => $montant,
+            'montant_recu'               => $montant_recu,
+            'frais'                      => $frais,
+            'commission'                 => $commission,
+            'prise_en_charge_commission' => $prise_en_charge_commission,
+            'autre_operateur_id'         => $autre_operateur_id,
+            'statut'                     => 'SUCCES',
+            'date_transaction'           => date('Y-m-d H:i:s'),
+        ]);
+    }
+    
     public function getHistorique($compte_id)
     {
         return $this
