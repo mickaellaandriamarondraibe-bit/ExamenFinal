@@ -507,6 +507,448 @@ Ajouter un formulaire en haut :
 ```
 
 
+## 11. Frais gratuits entre deux clients du même opérateur
+
+### Demande possible du prof
+
+Si le transfert est entre deux numeros de notre operateur, les frais de transfert sont gratuits.
+
+### Idee
+
+Si `$autreOperateurId` est `null`, alors `$fraisTransfert = 0`.
+
+### Dans `TransactionController.php`
+
+Dans la fonction `calculerCoutsTransfert()` :
+
+```php
+if ($autreOperateurId === null) {
+    $fraisTransfert = 0;
+} else {
+    $baremeTransfert = $baremeModel->getFraisByMontant(3, $montant, null);
+
+    if (!$baremeTransfert) {
+        return ['erreur' => 'Bareme de transfert introuvable'];
+    }
+
+    $fraisTransfert = $baremeTransfert['frais'];
+}
+```
+
+### Attention
+
+Si le prof veut aussi garder les frais de retrait, il ne faut pas les supprimer.
+On met seulement les frais de transfert a `0`.
+
+
+## 12. Code secret avant validation d'une operation
+
+### Demande possible du prof
+
+Avant de confirmer un transfert ou un retrait, le client doit entrer un code secret.
+
+### Idee
+
+Ajouter un champ `code_secret` pour le client, puis comparer avec le code envoye dans le formulaire.
+
+### Dans la table `clients`
+
+Ajouter une colonne :
+
+```sql
+ALTER TABLE clients ADD COLUMN code_secret TEXT;
+```
+
+### Dans la vue
+
+Ajouter un input :
+
+```html
+<input type="password" name="code_secret" placeholder="Code secret">
+```
+
+### Dans `TransactionController.php`
+
+Avant d'enregistrer :
+
+```php
+$codeSecret = $this->request->getPost('code_secret');
+
+if ($codeSecret != $client['code_secret']) {
+    return $this->retourErreur('Code secret incorrect');
+}
+```
+
+### Attention
+
+Pour faire mieux, il faudrait hasher le code secret.
+Mais si le prof demande vite, une comparaison simple peut suffire pour montrer la logique.
+
+
+## 13. Refuser les montants avec des centimes
+
+### Demande possible du prof
+
+Les montants doivent etre des nombres entiers seulement.
+
+### Idee
+
+Un montant comme `1000.50` doit etre refuse.
+
+### Dans `TransactionController.php`
+
+Créer une fonction :
+
+```php
+private function verifierMontantEntier($montant)
+{
+    if ($montant != floor($montant)) {
+        return 'Le montant doit etre un nombre entier.';
+    }
+
+    return null;
+}
+```
+
+Puis dans `enregistrerTransfert()` :
+
+```php
+$erreurMontant = $this->verifierMontantEntier($montant);
+
+if ($erreurMontant) {
+    return $this->retourErreur($erreurMontant);
+}
+```
+
+### Dans la vue
+
+Mettre :
+
+```html
+<input type="number" step="1" name="montant">
+```
+
+
+## 14. Limiter le nombre de transferts par jour
+
+### Demande possible du prof
+
+Un client ne peut faire que `3` transferts par jour.
+
+### Idee
+
+On compte les transactions de type transfert faites aujourd'hui par le compte source.
+
+### Dans `TransactionModel.php`
+
+Créer une fonction :
+
+```php
+public function compterTransfertsJour($compteId)
+{
+    return $this
+        ->where('compte_source_id', $compteId)
+        ->where('type_operation_id', 3)
+        ->where('DATE(date_transaction)', date('Y-m-d'))
+        ->countAllResults();
+}
+```
+
+### Dans `TransactionController.php`
+
+Créer une fonction :
+
+```php
+private function verifierNombreTransfertsJour($transactionModel, $compteId)
+{
+    $nombre = $transactionModel->compterTransfertsJour($compteId);
+
+    if ($nombre >= 3) {
+        return 'Vous avez deja fait 3 transferts aujourd hui.';
+    }
+
+    return null;
+}
+```
+
+Puis dans `enregistrerTransfert()` :
+
+```php
+$erreurNombre = $this->verifierNombreTransfertsJour($transactionModel, $source['id']);
+
+if ($erreurNombre) {
+    return $this->retourErreur($erreurNombre);
+}
+```
+
+
+## 15. Justificatif obligatoire pour gros transfert
+
+### Demande possible du prof
+
+Si le montant depasse `1 000 000 Ar`, le client doit saisir une raison.
+
+### Idee
+
+Ajouter un champ `motif` dans le formulaire.
+
+### Dans la table `transactions`
+
+Ajouter une colonne :
+
+```sql
+ALTER TABLE transactions ADD COLUMN motif TEXT;
+```
+
+### Dans la vue
+
+Ajouter :
+
+```html
+<textarea name="motif" placeholder="Motif du transfert"></textarea>
+```
+
+### Dans `TransactionController.php`
+
+Avant l'enregistrement :
+
+```php
+$motif = $this->request->getPost('motif');
+
+if ($montant > 1000000 && trim($motif) == '') {
+    return $this->retourErreur('Le motif est obligatoire pour un gros transfert.');
+}
+```
+
+Puis il faut enregistrer `$motif` dans la transaction.
+
+
+## 16. Exporter la liste des transactions en CSV
+
+### Demande possible du prof
+
+L'operateur veut exporter les transactions en fichier CSV.
+
+### Idee
+
+Créer une route `/operateur/transactions/export`.
+
+### Dans `Routes.php`
+
+Ajouter :
+
+```php
+$routes->get('transactions/export', 'TransactionController::exportCsv');
+```
+
+### Dans `TransactionController.php`
+
+Créer une fonction :
+
+```php
+public function exportCsv()
+{
+    $transactionModel = new TransactionModel();
+    $transactions = $transactionModel->findAll();
+
+    $contenu = "ID,Type,Montant,Frais,Commission,Date\n";
+
+    foreach ($transactions as $transaction) {
+        $contenu .= $transaction['id'] . ",";
+        $contenu .= $transaction['type_operation_id'] . ",";
+        $contenu .= $transaction['montant'] . ",";
+        $contenu .= $transaction['frais'] . ",";
+        $contenu .= $transaction['commission'] . ",";
+        $contenu .= $transaction['date_transaction'] . "\n";
+    }
+
+    return $this->response
+        ->setHeader('Content-Type', 'text/csv')
+        ->setHeader('Content-Disposition', 'attachment; filename=transactions.csv')
+        ->setBody($contenu);
+}
+```
+
+### Dans la vue
+
+Ajouter un bouton :
+
+```html
+<a href="<?= base_url('operateur/transactions/export') ?>">Exporter CSV</a>
+```
+
+
+## 17. Historique avec filtre par type d'operation
+
+### Demande possible du prof
+
+Le client veut voir seulement les depots, les retraits ou les transferts.
+
+### Idee
+
+Ajouter un select dans l'historique client.
+
+### Dans la vue `historique.php`
+
+Ajouter :
+
+```html
+<form method="get">
+    <select name="type_operation_id">
+        <option value="">Tous</option>
+        <option value="1">Depot</option>
+        <option value="2">Retrait</option>
+        <option value="3">Transfert</option>
+    </select>
+    <button type="submit">Filtrer</button>
+</form>
+```
+
+### Dans `TransactionModel.php`
+
+Modifier ou créer une fonction :
+
+```php
+public function getHistoriqueFiltre($compteId, $typeOperationId)
+{
+    $query = $this
+        ->select('transactions.*, types_operations.libelle AS type_operation')
+        ->join('types_operations', 'types_operations.id = transactions.type_operation_id')
+        ->groupStart()
+            ->where('compte_source_id', $compteId)
+            ->orWhere('compte_destination_id', $compteId)
+        ->groupEnd();
+
+    if ($typeOperationId != '') {
+        $query->where('type_operation_id', $typeOperationId);
+    }
+
+    return $query->orderBy('date_transaction', 'DESC')->findAll();
+}
+```
+
+
+## 18. Recevoir une notification apres transaction
+
+### Demande possible du prof
+
+Apres un depot, retrait ou transfert, on doit enregistrer une notification pour le client.
+
+### Idee
+
+Créer une table `notifications`.
+
+### Dans `base.sql`
+
+Ajouter :
+
+```sql
+CREATE TABLE notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id INTEGER NOT NULL,
+    message TEXT NOT NULL,
+    lu INTEGER NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Dans `TransactionController.php`
+
+Après une transaction réussie :
+
+```php
+db_connect()->table('notifications')->insert([
+    'client_id' => $clientId,
+    'message' => 'Votre transfert a ete effectue avec succes',
+    'lu' => 0
+]);
+```
+
+### Dans l'accueil
+
+On peut afficher le nombre de notifications non lues a cote de l'icone cloche.
+
+
+## 19. Verifier que le numero a exactement 10 chiffres
+
+### Demande possible du prof
+
+Le numero doit contenir exactement 10 chiffres, pas de lettres.
+
+### Idee
+
+Utiliser `preg_match`.
+
+### Dans `TransactionController.php`
+
+Créer une fonction :
+
+```php
+private function verifierNumero($telephone)
+{
+    if (!preg_match('/^[0-9]{10}$/', $telephone)) {
+        return 'Le numero doit contenir exactement 10 chiffres.';
+    }
+
+    return null;
+}
+```
+
+Puis dans `enregistrerTransfert()` :
+
+```php
+$erreurNumero = $this->verifierNumero($telephone);
+
+if ($erreurNumero) {
+    return $this->retourErreur($erreurNumero);
+}
+```
+
+
+## 20. Afficher le gain net de l'operateur
+
+### Demande possible du prof
+
+Dans la situation des gains, afficher le gain net :
+
+```text
+gain net = frais encaisses - commissions a payer aux autres operateurs
+```
+
+### Idee
+
+On additionne les frais et on soustrait les commissions.
+
+### Dans `GainModel.php`
+
+Créer une fonction :
+
+```php
+public function getGainNet()
+{
+    return $this
+        ->select('SUM(frais) - SUM(commission) AS gain_net')
+        ->first();
+}
+```
+
+### Dans `GainController.php`
+
+Ajouter :
+
+```php
+$data['gainNet'] = $model->getGainNet();
+```
+
+### Dans la vue `gains/index.php`
+
+Afficher :
+
+```php
+<?= number_format($gainNet['gain_net'] ?? 0, 0, ',', ' ') ?> Ar
+```
+
+
 # Resume rapide
 
 Les aléas possibles sont :
@@ -521,6 +963,16 @@ Les aléas possibles sont :
 8. frais reduits pour gros montant
 9. compte client bloque
 10. recherche des transactions par date
+11. frais gratuits entre clients internes
+12. code secret obligatoire
+13. montant entier seulement
+14. nombre de transferts limite par jour
+15. motif obligatoire pour gros transfert
+16. export CSV des transactions
+17. filtre historique par type
+18. notifications apres transaction
+19. numero exactement 10 chiffres
+20. gain net de l'operateur
 
 Dans presque tous les cas, il faut faire :
 
