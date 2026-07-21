@@ -62,11 +62,8 @@ class BaremeFraisModel extends Model
         ->where('baremes_frais.id', $id)
         ->first();
 }
-     public function getFraisByMontant(
-        $typeOperationId,
-        $montant,
-        $autreOperateurId = null
-    ) {
+     public function getFraisByMontant($typeOperationId,$montant,$autreOperateurId = null) 
+     {
         $builder = $this
             ->where('type_operation_id', $typeOperationId)
             ->where('montant_min <=', $montant)

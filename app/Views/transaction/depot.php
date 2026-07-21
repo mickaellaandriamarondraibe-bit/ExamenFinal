@@ -32,12 +32,10 @@
         </div>
       </div>
 
-     
-
-<div class="card">
-  <div class="detail-row"><span>Frais</span><span id="frais">0 Ar</span></div>
-  <div class="detail-row"><span>Vous allez recevoir</span><span id="recevra">0 Ar</span></div>
-</div>
+      <div class="card">
+        <div class="detail-row"><span>Frais</span><span id="frais">0 Ar</span></div>
+        <div class="detail-row"><span>Vous allez recevoir</span><span id="recevra">0 Ar</span></div>
+      </div>
 
       <div style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">Points de dépôt disponibles</div>
       <div class="card-white">

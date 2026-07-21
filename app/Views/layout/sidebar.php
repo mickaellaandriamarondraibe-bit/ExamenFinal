@@ -40,6 +40,11 @@
             <span>Autres operateurs</span>
         </a>
 
+        <a href="<?= base_url('operateur/commissions') ?>" class="sidebar-link">
+            <i class="bi bi-list-ul"></i>
+            <span>Configuration Commission</span>
+        </a>
+
         <a href="<?= base_url('operateur/baremes-frais') ?>" class="sidebar-link">
             <i class="bi bi-cash-stack"></i>
             <span>Barèmes de frais</span>

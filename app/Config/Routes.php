@@ -89,6 +89,15 @@ $routes->group('operateur', ['filter' => 'auth:operateur'], function ($routes) {
     'montants-operateurs',
     'TransactionController::montantsOperateurs'
     );
+
+    /* CRUD commission */
+    $routes->get('commissions', 'CommissionController::index');
+    $routes->get('commissions/create', 'CommissionController::create');
+    $routes->post('commissions/store', 'CommissionController::store');
+    $routes->get('commissions/edit/(:num)', 'CommissionController::edit/$1');
+    $routes->post('commissions/update/(:num)', 'CommissionController::update/$1');
+    $routes->get('commissions/delete/(:num)', 'CommissionController::delete/$1');
+
         /* CRUD bareme */
     $routes->get('baremes-frais', 'BaremeFraisController::index');
     $routes->get('baremes-frais/create', 'BaremeFraisController::create');
