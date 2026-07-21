@@ -77,6 +77,14 @@ $routes->group('operateur', ['filter' => 'auth:operateur'], function ($routes) {
     $routes->post('types-operations/update/(:num)', 'TypeOperationController::update/$1');
     $routes->get('types-operations/delete/(:num)', 'TypeOperationController::delete/$1');
 
+    /* CRUD reduction */
+     $routes->get('reduction', 'ReductionController::index');
+    $routes->get('reduction/create', 'ReductionController::create');
+    $routes->post('reduction/store', 'ReductionController::store');
+    $routes->post('reduction/update/(:num)', 'ReductionController::update/$1');
+    $routes->get('reduction/delete/(:num)', 'ReductionController::delete/$1');
+
+
     /* CRUD autres operateurs */
     $routes->get('autres_operateurs', 'AutreOperateurController::index');
     $routes->get('autres_operateurs/create', 'AutreOperateurController::create');

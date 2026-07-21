@@ -98,6 +98,13 @@ CREATE TABLE baremes_frais (
         REFERENCES autre_operateur(id)
 );
 
+CREATE TABLE reduction(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reduction REAL NOT NULL
+)
+
+INSERT INTO reduction (reduction) VALUES (2);
+
 
 -- =========================================================
 -- CLIENTS

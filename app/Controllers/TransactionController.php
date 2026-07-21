@@ -8,7 +8,7 @@ use App\Models\CommissionInterOperateurModel;
 use App\Models\CompteModel;
 use App\Models\PrefixModel;
 use App\Models\TransactionModel;
-
+use App\Models\Reduction;
 class TransactionController extends BaseController
 {
     public function index()
@@ -119,10 +119,12 @@ class TransactionController extends BaseController
     }
 
     public function enregistrerTransfert()
-    {
-        $clientId = session()->get('client_id');
+    {   //recuperation des donnee
+        $clientId = session()->get('client_id'); 
         $montant = (float) $this->request->getPost('montant');
+        //enlever les espace dans les numero de tel 
         $telephone = $this->nettoyerTelephone($this->request->getPost('telephone'));
+        //si checkbox selectionner on inclu frais sinon non 
         $inclureRetrait = $this->request->getPost('inclure_frais_retrait') ? 1 : 0;
 
         if (!$clientId) {
@@ -135,6 +137,8 @@ class TransactionController extends BaseController
 
         $compteModel = new CompteModel();
         $transactionModel = new TransactionModel();
+
+        //recuperation du compte source et compte destinataire 
         $source = $compteModel->getCompteByClientId($clientId);
         $destination = $this->getDestinataire($compteModel, new PrefixModel(), $telephone, $source);
 
@@ -432,13 +436,19 @@ class TransactionController extends BaseController
     {
         $baremeModel = new BaremeFraisModel();
         $commissionModel = new CommissionInterOperateurModel();
+        $reduction = new Reduction();
         $baremeTransfert = $baremeModel->getFraisByMontant(3, $montant, null);
-
+        $reductionFrai = $reduction->first();
         if (!$baremeTransfert) {
             return ['erreur' => 'Barème de transfert introuvable'];
         }
+      
+        if($autreOperateurId == 0){
+            $reductionTable = $baremeTransfert['frais'] * (float) $reductionFrai['reduction'] / 100;
+        }
 
-        $fraisTransfert = (float) $baremeTransfert['frais'];
+
+        $fraisTransfert = (float) $baremeTransfert['frais'] - $reductionTable ;
         $fraisRetrait = $this->getFraisRetraitSiPossible($montant, $autreOperateurId, $inclureRetrait);
         $commission = $this->getCommission($commissionModel, $montant, $autreOperateurId, $commissionObligatoire);
 
