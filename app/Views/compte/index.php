@@ -53,6 +53,10 @@
                             <a href="<?= base_url('operateur/historique2/' . $compte['id']) ?>" class="btn btn-info btn-sm">
                                 Voir
                             </a>
+
+                            <a href="<?= base_url('operateur/historique2/' . $compte['id']) ?>" class="btn btn-info btn-sm">
+                                Modifier taux epargne
+                            </a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

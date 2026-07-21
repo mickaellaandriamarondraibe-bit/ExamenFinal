@@ -14,6 +14,8 @@ class CompteModel extends Model
         'numero_compte',
         'solde',
         'statut',
+        'epargne',
+        'taux_epargne'
     ];
 
     public function getAllWithClient()
@@ -38,6 +40,8 @@ class CompteModel extends Model
             'numero_compte' => $numero_compte,
             'solde'         => 0,
             'statut'        => 'ACTIF',
+            'epargne'       => 0 ,
+            'taux_epargne'  =>0
         ];
 
         return $this->insert($data);

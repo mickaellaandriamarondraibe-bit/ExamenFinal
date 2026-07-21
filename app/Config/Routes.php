@@ -27,6 +27,9 @@ $routes->post('transfert', 'TransactionController::enregistrerTransfert');
 
 $routes->get('solde', 'ClientController::solde');
 
+$routes->get('epargne', 'ClientController::epargne');
+$routes->post('epargne', 'CompteController::ModifierEpargne');
+
 $routes->get('historique', 'TransactionController::historique');
 
 $routes->get(

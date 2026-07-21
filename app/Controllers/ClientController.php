@@ -106,6 +106,29 @@ class ClientController extends BaseController
     return view('clients/solde', $data);
 }
 
+    public function epargne()
+{
+    $client_id = session()->get('client_id');
+
+    if (!$client_id) {
+        return redirect()->to('/');
+    }
+
+    $compteModel = new CompteModel();
+    $compte = $compteModel->getCompteByClientId($client_id);
+
+    if (!$compte) {
+        return redirect()->to('/accueil')
+            ->with('error', 'Compte introuvable');
+    }
+
+    $data['compte'] = $compte;
+
+    return view('clients/epargne', $data);
+}
+
+
+
 public function getAllclient(){
         $ClientModel = new ClientModel();
 

@@ -86,3 +86,20 @@
 | Mickaellah | 5 blocs | ~3h30 |
 | Idealy | 5 blocs | ~3h30 |
 | Ensemble | 3 moments | ~1h00 |
+
+
+
+
+
+
+
+
+
+
+
+
+
+rm -f writable/mobile_money.sqlite
+sqlite3 writable/mobile_money.sqlite < base.sql
+sqlite3 writable/mobile_money.sqlite
+.tables

@@ -101,7 +101,7 @@ CREATE TABLE baremes_frais (
 CREATE TABLE reduction(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     reduction REAL NOT NULL
-)
+) ;
 
 INSERT INTO reduction (reduction) VALUES (2);
 
@@ -115,10 +115,13 @@ CREATE TABLE clients (
     prefix_id INTEGER NOT NULL,
     telephone TEXT NOT NULL UNIQUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+ 
 
     FOREIGN KEY (prefix_id)
         REFERENCES prefixes(id)
 );
+
+
 
 
 -- =========================================================
@@ -132,12 +135,16 @@ CREATE TABLE comptes (
     solde INTEGER NOT NULL DEFAULT 0,
     statut TEXT NOT NULL DEFAULT 'ACTIF',
 
+    epargne INTEGER NOT NULL DEFAULT 0,
+    taux_epargne REAL NOT NULL DEFAULT 0,
+
     CHECK (solde >= 0),
     CHECK (statut IN ('ACTIF', 'INACTIF', 'BLOQUE')),
 
     FOREIGN KEY (client_id)
         REFERENCES clients(id)
 );
+
 
 
 -- =========================================================
