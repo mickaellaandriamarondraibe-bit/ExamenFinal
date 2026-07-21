@@ -75,11 +75,8 @@ CREATE TABLE types_operations (
 -- =========================================================
 -- BARÈMES DE FRAIS
 --
--- autre_operateur_id = NULL :
--- barème de notre opérateur
---
--- autre_operateur_id renseigné :
--- barème spécifique à Orange, Airtel, etc.
+-- Les frais sont ceux de notre opérateur.
+-- Les autres opérateurs utilisent seulement une commission.
 -- =========================================================
 
 CREATE TABLE baremes_frais (
@@ -198,57 +195,6 @@ VALUES
 ('Orange'),
 ('Airtel');
 
--- =========================================================
--- CLIENTS DES AUTRES OPÉRATEURS
--- =========================================================
-
--- Clients Orange (préfixe 032 => prefix_id = 3)
-INSERT INTO clients (
-    prefix_id,
-    telephone
-)
-VALUES
-(3, '0321234567'),
-(3, '0329876543');
-
-
--- Clients Airtel (préfixe 031 => prefix_id = 4)
-INSERT INTO clients (
-    prefix_id,
-    telephone
-)
-VALUES
-(4, '0311234567'),
-(4, '0319876543');
-
-
-
--- =========================================================
--- COMPTES DES CLIENTS DES AUTRES OPÉRATEURS
--- =========================================================
-
--- Comptes Orange
-INSERT INTO comptes (
-    client_id,
-    numero_compte,
-    solde,
-    statut
-)
-VALUES
-(1, 'ORANGE001', 500000, 'ACTIF'),
-(2, 'ORANGE002', 300000, 'ACTIF');
-
-
--- Comptes Airtel
-INSERT INTO comptes (
-    client_id,
-    numero_compte,
-    solde,
-    statut
-)
-VALUES
-(3, 'AIRTEL001', 700000, 'ACTIF'),
-(4, 'AIRTEL002', 200000, 'ACTIF');
 
 -- =========================================================
 -- INSERTION DES PRÉFIXES
@@ -352,10 +298,11 @@ VALUES
 
 
 -- =========================================================
--- BARÈMES DE TRANSFERT INTERNE
+-- BARÈMES DE TRANSFERT
 --
--- Entre deux numéros 033 ou 037.
--- Aucune commission inter-opérateur.
+-- Même barème pour un transfert interne ou vers un autre opérateur.
+-- Si le destinataire est chez un autre opérateur, une commission
+-- est ajoutée avec la table commissions_inter_operateurs.
 -- =========================================================
 
 INSERT INTO baremes_frais (
@@ -369,41 +316,3 @@ VALUES
 (3, NULL, 1, 100000, 1000),
 (3, NULL, 100001, 1000000, 2000),
 (3, NULL, 1000001, 5000000, 4000);
-
-
--- =========================================================
--- BARÈMES DE TRANSFERT VERS ORANGE
---
--- Commission supplémentaire : 2 %
--- =========================================================
-
-INSERT INTO baremes_frais (
-    type_operation_id,
-    autre_operateur_id,
-    montant_min,
-    montant_max,
-    frais
-)
-VALUES
-(3, 1, 1, 100000, 1200),
-(3, 1, 100001, 1000000, 2500),
-(3, 1, 1000001, 5000000, 5000);
-
-
--- =========================================================
--- BARÈMES DE TRANSFERT VERS AIRTEL
---
--- Commission supplémentaire : 2,5 %
--- =========================================================
-
-INSERT INTO baremes_frais (
-    type_operation_id,
-    autre_operateur_id,
-    montant_min,
-    montant_max,
-    frais
-)
-VALUES
-(3, 2, 1, 100000, 1300),
-(3, 2, 100001, 1000000, 2700),
-(3, 2, 1000001, 5000000, 5500);
