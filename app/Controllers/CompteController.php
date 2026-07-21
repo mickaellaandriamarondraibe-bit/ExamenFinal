@@ -75,21 +75,25 @@ class CompteController extends BaseController
         return redirect()->to('/compte');
     }
 
-    public function modifierEpargne()
-    {
-        $client_id = session()->get('client_id');
+public function modifierEpargne()
+{
+    $client_id = session()->get('client_id');
 
     if (!$client_id) {
         return redirect()->to('/');
     }
 
-        $compteModel = new CompteModel();
-        $compte = $compteModel->getCompteByClientId($client_id);
-        $taux = $this->request->getPost('taux_epargne') ;
-       ( $compte)->update($id,['taux_epargne '=>$taux ] ) ;
+    $compteModel = new CompteModel();
+    $compte = $compteModel->getCompteByClientId($client_id);
 
-       return redirect()->to('/compte');
-    }
+    $taux = $this->request->getPost('tauxepargne');
+
+    $compteModel->update($compte['id'], [
+        'taux_epargne' => $taux
+    ]);
+
+    return redirect()->to('/compte');
+}
 
 
     public function delete($id)
